@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Morse Code Translator with Sound</title>
+  <link rel="stylesheet" href="morse-translator.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Morse Code Translator</h1>
+    <textarea id="input" placeholder="Enter text here" rows="4" cols="50"></textarea>
+    <div class="buttons">
+      <button id="translateButton">Translate to Morse</button>
+      <button id="stopButton">Stop Translation</button>
+    </div>
+    <div class="controls">
+      <div class="control-group">
+        <label for="speed">WPM:</label>
+        <input type="range" id="speed" min="5" max="40" value="20">
+        <span id="speedValue">20</span>
+      </div>
+      <div class="control-group">
+        <label for="tone">Tone Frequency (Hz):</label>
+        <input type="range" id="tone" min="500" max="2000" value="1000">
+        <span id="toneValue">1000</span>
+      </div>
+    </div>
+    <div id="display"></div>
+  </div>
+  <script src="morse-translator.js"></script>
+</body>
+</html>
