@@ -52,6 +52,8 @@ body {
     cursor: pointer;
     color: #fff;
     transition: background-color 0.3s ease;
+    margin-left: 5px;
+    margin-right: 5px;
   }
   
   #translateButton {
@@ -70,6 +72,13 @@ body {
     background-color: #c0392b;
   }
   
+  #clearButton {
+    background-color: #adab12;
+  }
+  
+  #clearButton:hover {
+    background-color: #d4c219;
+  }
   .home-button {
     background-color: #3b89cd;
     color: #fff;

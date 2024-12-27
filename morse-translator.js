@@ -125,4 +125,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
-  
+const clearButton = document.getElementById('clearButton');
+
+clearButton.addEventListener('click', () => {
+  inputField.value = '';
+  displayArea.textContent = '';
+  clearOscillators();
+  isPlaying = false;
+});
