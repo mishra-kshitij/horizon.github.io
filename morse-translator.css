@@ -57,7 +57,7 @@ body {
   }
   
   #translateButton {
-    background-color: #38a50d;
+    background-color: #1a578d;
   }
   
   #translateButton:hover {
@@ -73,7 +73,7 @@ body {
   }
   
   #clearButton {
-    background-color: #91aa00;
+    background-color: #1a578d;
   }
   
   #clearButton:hover {
@@ -93,7 +93,7 @@ body {
   }
   
   .home-button:hover {
-    background-color: #1a578d;
+    background-color: #508da0;
   }
   
   #toggleDisplayButton {
