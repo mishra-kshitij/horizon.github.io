@@ -1,5 +1,5 @@
 function sendEmail() {
-    window.location.href = "mailto:kshitij.mishra@hotmail.com";
+    window.location.href = "mailto:vu2jdc@gmail.com";
 }
 
 function openMorsePage() {
