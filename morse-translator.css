@@ -57,15 +57,15 @@ body {
   }
   
   #translateButton {
-    background-color: #1a578d;
+    background-color: #3b89cd;
   }
   
   #translateButton:hover {
-    background-color: #00c71b;
+    background-color: #0a8a1b;
   }
   
   #stopButton {
-    background-color: #4e0c05;
+    background-color: #3b89cd;
   }
   
   #stopButton:hover {
@@ -73,14 +73,14 @@ body {
   }
   
   #clearButton {
-    background-color: #1a578d;
+    background-color: #3b89cd;
   }
   
   #clearButton:hover {
     background-color: #be9305;
   }
   .home-button {
-    background-color: #3c92cc;
+    background-color: #3b89cd;
     color: #fff;
     padding: 5px 10px;
     border: none;
@@ -93,18 +93,18 @@ body {
   }
   
   .home-button:hover {
-    background-color: #508da0;
+    background-color: #11416b;
   }
   
   #toggleDisplayButton {
-    background-color: #6c757d;
+    background-color: #6c7881;
     color: #fff;
-    padding: 10px;
+    padding: 5px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
-    margin-top: 20px;
+    margin-top: 15px;
   }
   
   #toggleDisplayButton:hover {
