@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-
   const toggleBtn = document.getElementById('toggleTheme');
   toggleBtn.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
@@ -8,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
       ? '☀️ Switch to Light Mode'
       : '🌙 Switch to Dark Mode';
   });
-
 
   const faders = document.querySelectorAll('section');
   const appearOnScroll = new IntersectionObserver(entries => {
@@ -21,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { threshold: 0.1 });
 
   faders.forEach(section => appearOnScroll.observe(section));
-
 
   document.getElementById('emailMeBtn').addEventListener('click', () => {
     window.location.href = 'mailto:kshitij.mishra@hotmail.com?subject=Let’s Connect!';
