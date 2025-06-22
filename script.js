@@ -1,41 +1,37 @@
-function sendEmail() {
-    window.location.href = "mailto:vu2jdc@gmail.com";
-}
+document.addEventListener('DOMContentLoaded', () => {
 
-function openMorsePage() {
-    window.open('morse-translator.html', '_blank');
-}
+  const toggleBtn = document.getElementById('toggleTheme');
+  toggleBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    document.body.classList.toggle('light-mode');
+    toggleBtn.textContent = document.body.classList.contains('dark-mode')
+      ? '☀️ Switch to Light Mode'
+      : '🌙 Switch to Dark Mode';
+  });
 
-function openZedaIn() {
+
+  const faders = document.querySelectorAll('section');
+  const appearOnScroll = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        appearOnScroll.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  faders.forEach(section => appearOnScroll.observe(section));
+
+
+  document.getElementById('emailMeBtn').addEventListener('click', () => {
+    window.location.href = 'mailto:kshitij.mishra@hotmail.com?subject=Let’s Connect!';
+  });
+
+  document.getElementById('morseCodeBtn').addEventListener('click', () => {
+    window.open('https://kshitijmishra.in/morse-translator.html', '_blank');
+  });
+
+  document.getElementById('zedaInBtn').addEventListener('click', () => {
     window.open('https://zeda.in', '_blank');
-}
-document.addEventListener("DOMContentLoaded", () => {
-  const clearButton = document.getElementById("clearButton");
-  const textArea = document.getElementById("input");
-  const speedSlider = document.getElementById("speed");
-  const speedValue = document.getElementById("speedValue");
-  const toneSlider = document.getElementById("tone");
-  const toneValue = document.getElementById("toneValue");
-  const volumeSlider = document.getElementById("volume");
-  const volumeValue = document.getElementById("volumeValue");
-
-  // Clear textarea
-  clearButton.addEventListener("click", () => {
-    textArea.value = "";
-  });
-
-  // Update WPM value
-  speedSlider.addEventListener("input", () => {
-    speedValue.textContent = speedSlider.value;
-  });
-
-  // Update tone frequency value
-  toneSlider.addEventListener("input", () => {
-    toneValue.textContent = toneSlider.value;
-  });
-
-  // Update volume value
-  volumeSlider.addEventListener("input", () => {
-    volumeValue.textContent = `${volumeSlider.value}%`;
   });
 });
