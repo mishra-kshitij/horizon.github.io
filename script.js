@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('morseCodeBtn').addEventListener('click', () => {
-    window.open('morse-translator.html', '_blank');
+    window.open('https://kshitijmishra.in/morse-translator.html', '_blank');
   });
 
   document.getElementById('zedaInBtn').addEventListener('click', () => {
