@@ -4,8 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.toggle('dark-mode');
     document.body.classList.toggle('light-mode');
     toggleBtn.textContent = document.body.classList.contains('dark-mode')
-      ? '☀️ Switch to Light Mode'
-      : '🌙 Switch to Dark Mode';
+      ? '☀️ Light Mode'
+      : '🌙 Dark Mode';
   });
 
   const faders = document.querySelectorAll('section');
@@ -21,14 +21,14 @@ document.addEventListener('DOMContentLoaded', () => {
   faders.forEach(section => appearOnScroll.observe(section));
 
   document.getElementById('emailMeBtn').addEventListener('click', () => {
-    window.location.href = 'mailto:kshitij.mishra@hotmail.com?subject=Let’s Connect!';
+    window.location.href = 'mailto:vu2jdc@gmail.com?subject=Let’s Connect!';
   });
 
   document.getElementById('morseCodeBtn').addEventListener('click', () => {
-    window.open('https://kshitijmishra.in/morse-translator.html', '_blank');
+    window.open('https://kshitijmishra.in/morse-translator.html/', '_blank');
   });
 
   document.getElementById('zedaInBtn').addEventListener('click', () => {
-    window.open('https://zeda.in', '_blank');
+    window.open('https://zeda.in/', '_blank');
   });
 });
