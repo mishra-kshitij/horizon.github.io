@@ -86,6 +86,23 @@ body {
   transform: scale(0.98);
 }
 
+.dark-mode .theme-toggle button,
+.dark-mode .theme-toggle button:hover,
+.dark-mode .theme-toggle button:active {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background-color: transparent;
+}
+
+.dark-mode .theme-toggle button:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.dark-mode .theme-toggle button:active {
+  background-color: var(--accent-color);
+}
+
 .hero-section {
   text-align: center;
   margin-bottom: 2.5rem;
@@ -179,6 +196,17 @@ h1 {
   transform: scale(0.98);
 }
 
+.dark-mode .btn {
+  border: 2px solid black;
+  color: black;
+}
+
+.dark-mode .btn:hover {
+  background-color: black;
+  color: white;
+  border-color: black;
+}
+
 .secondary-btn {
   background: transparent;
   border: 2px solid var(--primary-color);
@@ -197,6 +225,23 @@ h1 {
   background-color: var(--accent-color);
   border-color: var(--accent-color);
   transform: scale(0.98);
+}
+
+.dark-mode .secondary-btn,
+.dark-mode .secondary-btn:hover,
+.dark-mode .secondary-btn:active {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background-color: transparent;
+}
+
+.dark-mode .secondary-btn:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.dark-mode .secondary-btn:active {
+  background-color: var(--accent-color);
 }
 
 section {
