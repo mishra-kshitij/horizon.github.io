@@ -55,7 +55,6 @@ body {
   border: 5px solid black;
 }
 
-
 .theme-toggle {
   text-align: center;
   padding: 10px;
@@ -178,17 +177,6 @@ h1 {
   background-color: #f0f0f0;
   border-color: #f0f0f0;
   transform: scale(0.98);
-}
-
-.dark-mode .btn {
-  border: 2px solid black;
-  color: black;
-}
-
-.dark-mode .btn:hover {
-  background-color: black;
-  color: white;
-  border-color: black;
 }
 
 .secondary-btn {
