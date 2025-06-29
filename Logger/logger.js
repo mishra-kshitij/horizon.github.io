@@ -150,7 +150,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const entry = logEntries[index];
 
             if (listItem.classList.contains('editing')) {
-                // Save logic
                 const editedCallSign = listItem.querySelector('.edit-callsign').value.trim().toUpperCase();
                 const editedFrequency = parseFloat(listItem.querySelector('.edit-frequency').value);
                 const editedMode = listItem.querySelector('.edit-mode').value;
@@ -162,12 +161,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     entry.band = getHamBand(editedFrequency);
                     entry.mode = editedMode;
                     entry.time = convertLocalToUTC(editedLocalTime);
-                    renderLog(); // Re-render the entire log to update the display
+                    renderLog();
                 } else {
                     alert('Please ensure all fields are valid for saving.');
                 }
             } else {
-                // Edit mode
                 listItem.classList.add('editing');
                 e.target.textContent = 'Save';
 

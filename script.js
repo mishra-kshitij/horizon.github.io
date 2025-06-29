@@ -25,11 +25,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('morseCodeBtn').addEventListener('click', () => {
-    window.open('MT_Web/morse-translator.html', '_blank');
+    window.open('mt_web/morse-translator.html', '_blank');
   });
 
   document.getElementById('hamRadioLoggerBtn').addEventListener('click', () => {
-    window.open('Logger/logger.html', '_blank');
+    window.open('logger/logger.html', '_blank');
   });
 
   document.getElementById('zedaInBtn').addEventListener('click', () => {
