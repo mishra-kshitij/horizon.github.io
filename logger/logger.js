@@ -117,12 +117,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="log-entry-info">
                     <span class="log-sequence-number">#${index + 1}</span>
                     <span><strong>Contact Callsign:</strong> ${entry.callSign}</span>
-                    <span><strong>Frequency:</strong> ${entry.frequency} MHz</span>
-                    <span><strong>Band:</strong> ${entry.band}</span>
-                    <span><strong>Mode:</strong> ${entry.mode}</span>
                     ${entry.rstSent ? `<span><strong>RST Sent:</strong> ${entry.rstSent}</span>` : ''}
                     ${entry.rstReceived ? `<span><strong>RST Rec:</strong> ${entry.rstReceived}</span>` : ''}
                     <span><strong>Time:</strong> ${formatUTCForDisplay(entry.time)}</span>
+                    <span><strong>Frequency:</strong> ${entry.frequency} MHz</span>
+                    <span><strong>Band:</strong> ${entry.band}</span>
+                    <span><strong>Mode:</strong> ${entry.mode}</span>
                     ${entry.comment ? `<span><strong>Comment:</strong> ${entry.comment}</span>` : ''}
                 </div>
                 <div class="log-entry-actions">
@@ -138,12 +138,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     addLogButton.addEventListener('click', () => {
         const callSign = callSignInput.value.trim().toUpperCase();
-        const frequency = parseFloat(frequencyInput.value);
-        const band = bandInput.value.trim();
-        const mode = modeSelect.value;
         const rstSent = rstSentInput.value.trim();
         const rstReceived = rstReceivedInput.value.trim();
         const localTime = timeInput.value;
+        const frequency = parseFloat(frequencyInput.value);
+        const band = bandInput.value.trim();
+        const mode = modeSelect.value;
         const comment = commentInput.value.trim();
 
         if (callSign && !isNaN(frequency) && frequency > 0 && band && mode && localTime) {
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
             commentInput.value = '';
             setInitialTime();
         } else {
-            alert('Please fill in all valid fields (Callsign, Frequency, Mode, Time).');
+            alert('Please fill in all valid fields (Contact Callsign, RST Sent, RST Received, Time, Frequency, Band, Mode).');
         }
     });
 
@@ -174,21 +174,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (listItem.classList.contains('editing')) {
                 const editedCallSign = listItem.querySelector('.edit-callsign').value.trim().toUpperCase();
-                const editedFrequency = parseFloat(listItem.querySelector('.edit-frequency').value);
-                const editedMode = listItem.querySelector('.edit-mode').value;
                 const editedRstSent = listItem.querySelector('.edit-rst-sent').value.trim();
                 const editedRstReceived = listItem.querySelector('.edit-rst-received').value.trim();
                 const editedLocalTime = listItem.querySelector('.edit-time').value;
+                const editedFrequency = parseFloat(listItem.querySelector('.edit-frequency').value);
+                const editedMode = listItem.querySelector('.edit-mode').value;
                 const editedComment = listItem.querySelector('.edit-comment').value.trim();
 
                 if (editedCallSign && !isNaN(editedFrequency) && editedFrequency > 0 && editedMode && editedLocalTime) {
                     entry.callSign = editedCallSign;
-                    entry.frequency = editedFrequency;
-                    entry.band = getHamBand(editedFrequency);
-                    entry.mode = editedMode;
                     entry.rstSent = editedRstSent;
                     entry.rstReceived = editedRstReceived;
                     entry.time = convertLocalToUTC(editedLocalTime);
+                    entry.frequency = editedFrequency;
+                    entry.band = getHamBand(editedFrequency);
+                    entry.mode = editedMode;
                     entry.comment = editedComment;
                     renderLog();
                 } else {
@@ -214,6 +214,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 logEntryInfo.innerHTML = `
                     <span class="log-sequence-number">${currentSequenceNumber}</span>
                     <label>Contact Callsign: <input type="text" class="edit-callsign" value="${entry.callSign}" required></label>
+                    <label>RST Sent: <input type="text" class="edit-rst-sent" value="${entry.rstSent || ''}"></label>
+                    <label>RST Received: <input type="text" class="edit-rst-received" value="${entry.rstReceived || ''}"></label>
+                    <label>Time (Local for Input, UTC for Log): <input type="datetime-local" class="edit-time" value="${convertUTCToLocalDateTime(entry.time)}" required></label>
                     <label>Frequency (MHz): <input type="number" step="0.001" class="edit-frequency" value="${entry.frequency}" required></label>
                     <label>Band: <input type="text" class="edit-band" value="${entry.band}" readonly></label>
                     <label>Mode: <select class="edit-mode" required>
@@ -230,9 +233,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         <option value="FST4" ${entry.mode === 'FST4' ? 'selected' : ''}>FST4</option>
                         <option value="MSK144" ${entry.mode === 'MSK144' ? 'selected' : ''}>MSK144</option>
                     </select></label>
-                    <label>RST Sent: <input type="text" class="edit-rst-sent" value="${entry.rstSent || ''}"></label>
-                    <label>RST Received: <input type="text" class="edit-rst-received" value="${entry.rstReceived || ''}"></label>
-                    <label>Time (Local for Input, UTC for Log): <input type="datetime-local" class="edit-time" value="${convertUTCToLocalDateTime(entry.time)}" required></label>
                     <label>Comment: <input type="text" class="edit-comment" value="${entry.comment || ''}" maxlength="75"></label>
                 `;
 

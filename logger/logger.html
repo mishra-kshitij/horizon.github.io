@@ -45,6 +45,22 @@
                 <input type="text" id="callSign" placeholder="Enter Contact Callsign" required>
             </div>
 
+            <div class="input-group rst-group">
+                <div class="rst-input">
+                    <label for="rstSent">RST Sent:</label>
+                    <input type="text" id="rstSent" placeholder="e.g., 599">
+                </div>
+                <div class="rst-input">
+                    <label for="rstReceived">RST Received:</label>
+                    <input type="text" id="rstReceived" placeholder="e.g., 599">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="logTime">Time (Local for Input, UTC for Log):</label>
+                <input type="datetime-local" id="logTime" required>
+            </div>
+
             <div class="input-group">
                 <label for="frequency">Frequency (MHz):</label>
                 <input type="number" id="frequency" step="0.001" placeholder="e.g., 145.500, 14.200" required>
@@ -72,22 +88,6 @@
                     <option value="FST4">FST4</option>
                     <option value="MSK144">MSK144</option>
                 </select>
-            </div>
-
-            <div class="input-group rst-group">
-                <div class="rst-input">
-                    <label for="rstSent">RST Sent:</label>
-                    <input type="text" id="rstSent" placeholder="e.g., 599">
-                </div>
-                <div class="rst-input">
-                    <label for="rstReceived">RST Received:</label>
-                    <input type="text" id="rstReceived" placeholder="e.g., 599">
-                </div>
-            </div>
-
-            <div class="input-group">
-                <label for="logTime">Time (Local for Input, UTC for Log):</label>
-                <input type="datetime-local" id="logTime" required>
             </div>
 
             <div class="input-group">
