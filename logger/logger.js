@@ -14,6 +14,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let logEntries = [];
 
+    userCallSignInput.value = localStorage.getItem('userCallSign') || '';
+    gridSquareInput.value = localStorage.getItem('gridSquare') || '';
+
+    userCallSignInput.addEventListener('input', () => {
+        localStorage.setItem('userCallSign', userCallSignInput.value.trim().toUpperCase());
+    });
+    gridSquareInput.addEventListener('input', () => {
+        localStorage.setItem('gridSquare', gridSquareInput.value.trim().toUpperCase());
+    });
+
     loadLogButton.addEventListener('click', () => {
         loadFileInput.click();
     });
@@ -58,23 +68,23 @@ document.addEventListener('DOMContentLoaded', () => {
     setInitialTime();
 
     const getHamBand = (frequency) => {
-        if (frequency >= 1.8 && frequency <= 2.0) return '160m (1.8-2.0 MHz)';
-        if (frequency >= 3.5 && frequency <= 4.0) return '80m (3.5-4.0 MHz)';
-        if (frequency >= 5.3 && frequency <= 5.45) return '60m (5.3-5.45 MHz)';
-        if (frequency >= 7.0 && frequency <= 7.3) return '40m (7.0-7.3 MHz)';
-        if (frequency >= 10.1 && frequency <= 10.15) return '30m (10.1-10.15 MHz)';
-        if (frequency >= 14.0 && frequency <= 14.35) return '20m (14.0-14.35 MHz)';
-        if (frequency >= 18.068 && frequency <= 18.168) return '17m (18.068-18.168 MHz)';
-        if (frequency >= 21.0 && frequency <= 21.45) return '15m (21.0-21.45 MHz)';
-        if (frequency >= 24.89 && frequency <= 24.99) return '12m (24.89-24.99 MHz)';
-        if (frequency >= 28.0 && frequency <= 29.7) return '10m (28.0-29.7 MHz)';
-        if (frequency >= 50.0 && frequency <= 54.0) return '6m (50.0-54.0 MHz)';
-        if (frequency >= 144.0 && frequency <= 148.0) return '2m (144.0-148.0 MHz)';
-        if (frequency >= 222.0 && frequency <= 225.0) return '1.25m (222-225 MHz)';
-        if (frequency >= 420.0 && frequency <= 450.0) return '70cm (420.0-450.0 MHz)';
-        if (frequency >= 902.0 && frequency <= 928.0) return '33cm (902-928 MHz)';
-        if (frequency >= 1240.0 && frequency <= 1300.0) return '23cm (1240-1300 MHz)';
-        return 'Unknown Band';
+        if (frequency >= 1.8 && frequency <= 2.0) return '160M';
+        if (frequency >= 3.5 && frequency <= 4.0) return '80M';
+        if (frequency >= 5.3 && frequency <= 5.45) return '60M';
+        if (frequency >= 7.0 && frequency <= 7.3) return '40M';
+        if (frequency >= 10.1 && frequency <= 10.15) return '30M';
+        if (frequency >= 14.0 && frequency <= 14.35) return '20M';
+        if (frequency >= 18.068 && frequency <= 18.168) return '17M';
+        if (frequency >= 21.0 && frequency <= 21.45) return '15M';
+        if (frequency >= 24.89 && frequency <= 24.99) return '12M';
+        if (frequency >= 28.0 && frequency <= 29.7) return '10M';
+        if (frequency >= 50.0 && frequency <= 54.0) return '6M';
+        if (frequency >= 144.0 && frequency <= 148.0) return '2M';
+        if (frequency >= 222.0 && frequency <= 225.0) return '1.25M';
+        if (frequency >= 420.0 && frequency <= 450.0) return '70CM';
+        if (frequency >= 902.0 && frequency <= 928.0) return '33CM';
+        if (frequency >= 1240.0 && frequency <= 1300.0) return '23CM';
+        return 'UNKNOWN';
     };
 
     frequencyInput.addEventListener('input', () => {
@@ -133,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
             callSignInput.value = '';
             setInitialTime();
         } else {
-            alert('Please fill in all valid fields.');
+            alert('Please fill in all valid fields (Callsign, Frequency, Mode, Time).');
         }
     });
 
@@ -201,16 +211,58 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    const formatADIFDate = (utcDateTimeString) => {
+        if (!utcDateTimeString) return '';
+        const date = new Date(utcDateTimeString);
+        const year = date.getUTCFullYear();
+        const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+        const day = date.getUTCDate().toString().padStart(2, '0');
+        return `${year}${month}${day}`;
+    };
+
+    const formatADIFTime = (utcDateTimeString) => {
+        if (!utcDateTimeString) return '';
+        const date = new Date(utcDateTimeString);
+        const hours = date.getUTCHours().toString().padStart(2, '0');
+        const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+        const seconds = date.getUTCSeconds().toString().padStart(2, '0');
+        return `${hours}${minutes}${seconds}`;
+    };
+
     saveLogButton.addEventListener('click', () => {
         if (logEntries.length === 0) {
             alert('No log entries to save.');
             return;
         }
 
-        const callSign = userCallSignInput.value.trim().toUpperCase();
+        const userCallSign = userCallSignInput.value.trim().toUpperCase();
         const gridSquare = gridSquareInput.value.trim().toUpperCase();
-        const fileName = `${callSign || 'Ham'}${gridSquare ? '_' + gridSquare : ''}_QSO_Log.json`;
-        const blob = new Blob([JSON.stringify(logEntries, null, 2)], { type: 'application/json' });
+        let adifContent = 'ADIF 3.1.0\r\n';
+
+        if (userCallSign || gridSquare) {
+            adifContent += `<PROGRAMID:VU2JDC_Logger>\r\n`;
+            adifContent += `<PROGRAMVERSION:1.0>\r\n`;
+            if (userCallSign) {
+                adifContent += `<OPERATOR:${userCallSign.length}>${userCallSign}\r\n`;
+            }
+            if (gridSquare) {
+                adifContent += `<MY_GRIDSQUARE:${gridSquare.length}>${gridSquare}\r\n`;
+            }
+        }
+        adifContent += '<EOH>\r\n';
+
+        logEntries.forEach(entry => {
+            adifContent += `<CALL:${entry.callSign.length}>${entry.callSign}\r\n`;
+            adifContent += `<FREQ:${entry.frequency.toFixed(3).length}>${entry.frequency.toFixed(3)}\r\n`;
+            adifContent += `<BAND:${entry.band.length}>${entry.band}\r\n`;
+            adifContent += `<MODE:${entry.mode.length}>${entry.mode}\r\n`;
+            adifContent += `<QSO_DATE:${formatADIFDate(entry.time).length}>${formatADIFDate(entry.time)}\r\n`;
+            adifContent += `<TIME_ON:${formatADIFTime(entry.time).length}>${formatADIFTime(entry.time)}\r\n`;
+            adifContent += '<EOR>\r\n';
+        });
+
+        const fileName = `${userCallSign || 'Ham'}${gridSquare ? '_' + gridSquare : ''}_QSO_Log.adi`;
+        const blob = new Blob([adifContent], { type: 'application/adif' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = fileName;
@@ -220,18 +272,68 @@ document.addEventListener('DOMContentLoaded', () => {
     loadFileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
+
+        if (!file.name.toLowerCase().endsWith('.adi')) {
+            alert('Please select an ADIF file (.adi).');
+            loadFileInput.value = '';
+            return;
+        }
+
         const reader = new FileReader();
         reader.onload = (event) => {
             try {
-                const data = JSON.parse(event.target.result);
-                if (Array.isArray(data)) {
-                    logEntries = data;
+                const adifContent = event.target.result;
+                const newLogEntries = [];
+
+                // Improved regex to capture all fields in a record, allowing for optional fields and flexible record ending
+                // It looks for <CALL:...> to start a new record, and captures subsequent known fields.
+                // It's more forgiving about what comes between fields and after the last required field before the next <CALL:...> or end of file.
+                const recordParts = adifContent.split('<EOR>'); // Split by EOR first, as it's the most reliable record delimiter if present
+
+                recordParts.forEach(part => {
+                    // Normalize spaces and newlines for easier regex matching
+                    const normalizedPart = part.replace(/\s+/g, ' ').trim();
+
+                    // Regex to extract individual fields from a single "record" string
+                    // This regex is designed to be more flexible, matching fields even if <EOR> is missing
+                    // It uses non-greedy matching (.*?) and makes fields optional where sensible
+                    const callMatch = /<CALL:(\d+)>([^<]+)/i.exec(normalizedPart);
+                    const freqMatch = /<FREQ:(\d+\.?\d*)>([^<]+)/i.exec(normalizedPart);
+                    const bandMatch = /<BAND:(\d+)>([^<]+)/i.exec(normalizedPart);
+                    const modeMatch = /<MODE:(\d+)>([^<]+)/i.exec(normalizedPart);
+                    const qsoDateMatch = /<QSO_DATE:(\d+)>([^<]+)/i.exec(normalizedPart);
+                    const timeOnMatch = /<TIME_ON:(\d+)>([^<]+)/i.exec(normalizedPart);
+
+                    if (callMatch && freqMatch && bandMatch && modeMatch && qsoDateMatch && timeOnMatch) {
+                        const callSign = callMatch[2];
+                        const frequency = parseFloat(freqMatch[2]);
+                        const band = bandMatch[2];
+                        const mode = modeMatch[2];
+                        const qsoDate = qsoDateMatch[2];
+                        const timeOn = timeOnMatch[2];
+
+                        const timeOnPadded = timeOn.padEnd(6, '0');
+                        const utcDateTimeString = `${qsoDate.substring(0, 4)}-${qsoDate.substring(4, 6)}-${qsoDate.substring(6, 8)}T${timeOnPadded.substring(0, 2)}:${timeOnPadded.substring(2, 4)}:${timeOnPadded.substring(4, 6)}Z`;
+
+                        newLogEntries.push({
+                            callSign: callSign,
+                            frequency: frequency,
+                            band: band,
+                            mode: mode,
+                            time: utcDateTimeString
+                        });
+                    }
+                });
+
+                if (newLogEntries.length > 0) {
+                    logEntries = newLogEntries;
                     renderLog();
                 } else {
-                    alert('Invalid log file.');
+                    alert('No valid ADIF entries found in the file or file is malformed. This logger tries to be flexible, but some ADIF files may vary greatly.');
                 }
             } catch (error) {
-                alert('Error reading log file.');
+                console.error('Error parsing ADIF file:', error);
+                alert('Error reading ADIF file. Please ensure it is a valid ADIF format.');
             }
         };
         reader.readAsText(file);
