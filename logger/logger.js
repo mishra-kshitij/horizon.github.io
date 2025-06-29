@@ -285,18 +285,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const adifContent = event.target.result;
                 const newLogEntries = [];
 
-                // Improved regex to capture all fields in a record, allowing for optional fields and flexible record ending
-                // It looks for <CALL:...> to start a new record, and captures subsequent known fields.
-                // It's more forgiving about what comes between fields and after the last required field before the next <CALL:...> or end of file.
-                const recordParts = adifContent.split('<EOR>'); // Split by EOR first, as it's the most reliable record delimiter if present
-
+                const recordParts = adifContent.split('<EOR>');
                 recordParts.forEach(part => {
-                    // Normalize spaces and newlines for easier regex matching
                     const normalizedPart = part.replace(/\s+/g, ' ').trim();
-
-                    // Regex to extract individual fields from a single "record" string
-                    // This regex is designed to be more flexible, matching fields even if <EOR> is missing
-                    // It uses non-greedy matching (.*?) and makes fields optional where sensible
                     const callMatch = /<CALL:(\d+)>([^<]+)/i.exec(normalizedPart);
                     const freqMatch = /<FREQ:(\d+\.?\d*)>([^<]+)/i.exec(normalizedPart);
                     const bandMatch = /<BAND:(\d+)>([^<]+)/i.exec(normalizedPart);
@@ -311,7 +302,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         const mode = modeMatch[2];
                         const qsoDate = qsoDateMatch[2];
                         const timeOn = timeOnMatch[2];
-
                         const timeOnPadded = timeOn.padEnd(6, '0');
                         const utcDateTimeString = `${qsoDate.substring(0, 4)}-${qsoDate.substring(4, 6)}-${qsoDate.substring(6, 8)}T${timeOnPadded.substring(0, 2)}:${timeOnPadded.substring(2, 4)}:${timeOnPadded.substring(4, 6)}Z`;
 
