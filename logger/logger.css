@@ -4,13 +4,13 @@ body {
     background-color: #0d1117;
     color: #e6edf3;
     display: flex;
-    flex-direction: column; /* Stack container and footer vertically */
-    justify-content: space-between; /* Push content to top, footer to bottom */
-    align-items: center; /* Center container horizontally */
-    min-height: 100vh; /* Ensure body takes at least full viewport height */
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 100vh;
     padding: 20px;
     box-sizing: border-box;
-    overflow-y: auto; /* Allows scrolling if content overflows */
+    overflow-y: auto;
 }
 
 .container {
@@ -22,8 +22,8 @@ body {
     max-width: 900px;
     animation: fadeIn 1s ease-out;
     border: 1px solid rgba(0, 255, 255, 0.3);
-    flex-grow: 1; /* Allows the container to grow and push the footer down */
-    margin-bottom: 30px; /* Space between container and footer */
+    flex-grow: 1;
+    margin-bottom: 30px;
 }
 
 @keyframes fadeIn {
@@ -53,13 +53,13 @@ h1 .highlight {
 }
 
 .sub-title a {
-    color: #00ffff; /* Set hyperlink color to match the theme */
-    text-decoration: none; /* Remove underline */
+    color: #00ffff;
+    text-decoration: none;
     transition: color 0.3s ease;
 }
 
 .sub-title a:hover {
-    color: #00ff80; /* Hover effect for hyperlink */
+    color: #00ff80;
 }
 
 
@@ -203,7 +203,7 @@ select {
 }
 
 .log-actions .primary-button,
-.log-actions .custom-file-upload { /* custom-file-upload not present in HTML, but kept for consistency if it was planned */
+.log-actions .custom-file-upload {
     width: 100%;
     margin-top: 0;
     height: auto;
@@ -373,7 +373,7 @@ input[type="file"] {
 @media (max-width: 768px) {
     .container {
         padding: 25px 30px;
-        margin-bottom: 20px; /* Adjust margin for smaller screens */
+        margin-bottom: 20px;
     }
 
     h1, h2 {
@@ -426,7 +426,7 @@ input[type="file"] {
     }
 
     footer {
-        padding: 1rem 0; /* Adjust footer padding for smaller screens */
+        padding: 1rem 0;
     }
 }
 
@@ -449,10 +449,10 @@ input[type="file"] {
 footer {
     text-align: center;
     font-size: 0.9rem;
-    padding: 1.5rem 0; /* Reduced top padding as container has margin-bottom */
-    border-top: 1px solid rgba(0, 255, 255, 0.1); /* Subtle border for separation */
-    color: #a3b3c3; /* Adjusted color for better contrast against dark background */
-    width: 100%; /* Ensure footer spans full width */
-    max-width: 900px; /* Match container max-width if desired, or remove */
+    padding: 1.5rem 0;
+    border-top: 1px solid rgba(0, 255, 255, 0.1);
+    color: #a3b3c3;
+    width: 100%;
+    max-width: 900px;
     opacity: 0.8;
 }
