@@ -112,6 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
             listItem.setAttribute('data-index', index);
             listItem.innerHTML = `
                 <div class="log-entry-info">
+                    <span class="log-sequence-number">#${index + 1}</span>
                     <span><strong>Contact Callsign:</strong> ${entry.callSign}</span>
                     <span><strong>Frequency:</strong> ${entry.frequency} MHz</span>
                     <span><strong>Band:</strong> ${entry.band}</span>
@@ -180,7 +181,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.target.textContent = 'Save';
 
                 const logEntryInfo = listItem.querySelector('.log-entry-info');
+                const currentSequenceNumber = listItem.querySelector('.log-sequence-number').textContent;
+
                 logEntryInfo.innerHTML = `
+                    <span class="log-sequence-number">${currentSequenceNumber}</span>
                     <label>Contact Callsign: <input type="text" class="edit-callsign" value="${entry.callSign}" required></label>
                     <label>Frequency (MHz): <input type="number" step="0.001" class="edit-frequency" value="${entry.frequency}" required></label>
                     <label>Band: <input type="text" class="edit-band" value="${entry.band}" readonly></label>
@@ -285,15 +289,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 const adifContent = event.target.result;
                 const newLogEntries = [];
 
-                const recordParts = adifContent.split('<EOR>');
-                recordParts.forEach(part => {
-                    const normalizedPart = part.replace(/\s+/g, ' ').trim();
-                    const callMatch = /<CALL:(\d+)>([^<]+)/i.exec(normalizedPart);
-                    const freqMatch = /<FREQ:(\d+\.?\d*)>([^<]+)/i.exec(normalizedPart);
-                    const bandMatch = /<BAND:(\d+)>([^<]+)/i.exec(normalizedPart);
-                    const modeMatch = /<MODE:(\d+)>([^<]+)/i.exec(normalizedPart);
-                    const qsoDateMatch = /<QSO_DATE:(\d+)>([^<]+)/i.exec(normalizedPart);
-                    const timeOnMatch = /<TIME_ON:(\d+)>([^<]+)/i.exec(normalizedPart);
+                let dataContent = adifContent.toUpperCase();
+                const eohIndex = dataContent.indexOf('<EOH>');
+                if (eohIndex !== -1) {
+                    dataContent = dataContent.substring(eohIndex + '<EOH>'.length);
+                }
+
+                const rawRecords = dataContent.split('<CALL:');
+
+                for (let i = 1; i < rawRecords.length; i++) {
+                    const recordString = '<CALL:' + rawRecords[i];
+
+                    const callMatch = /<CALL:(\d+)>([^<]+)/.exec(recordString);
+                    const freqMatch = /<FREQ:(\d+\.?\d*)>([^<]+)/.exec(recordString);
+                    const bandMatch = /<BAND:(\d+)>([^<]+)/.exec(recordString);
+                    const modeMatch = /<MODE:(\d+)>([^<]+)/.exec(recordString);
+                    const qsoDateMatch = /<QSO_DATE:(\d+)>([^<]+)/.exec(recordString);
+                    const timeOnMatch = /<TIME_ON:(\d+)>([^<]+)/.exec(recordString);
 
                     if (callMatch && freqMatch && bandMatch && modeMatch && qsoDateMatch && timeOnMatch) {
                         const callSign = callMatch[2];
@@ -302,6 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const mode = modeMatch[2];
                         const qsoDate = qsoDateMatch[2];
                         const timeOn = timeOnMatch[2];
+
                         const timeOnPadded = timeOn.padEnd(6, '0');
                         const utcDateTimeString = `${qsoDate.substring(0, 4)}-${qsoDate.substring(4, 6)}-${qsoDate.substring(6, 8)}T${timeOnPadded.substring(0, 2)}:${timeOnPadded.substring(2, 4)}:${timeOnPadded.substring(4, 6)}Z`;
 
@@ -313,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             time: utcDateTimeString
                         });
                     }
-                });
+                }
 
                 if (newLogEntries.length > 0) {
                     logEntries = newLogEntries;
