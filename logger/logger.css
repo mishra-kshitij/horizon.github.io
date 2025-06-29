@@ -180,7 +180,7 @@ select {
     background-color: #00ffff;
     color: #0d1117;
     border: none;
-    padding: 15px 25px;
+    padding: 12px 25px; 
     border-radius: 8px;
     font-size: 1.1em;
     font-weight: bold;
