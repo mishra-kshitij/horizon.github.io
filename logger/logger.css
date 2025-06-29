@@ -142,7 +142,7 @@ input[type="text"],
 input[type="number"],
 input[type="datetime-local"],
 select {
-    width: calc(100% - 24px);
+    width: calc(100%);
     padding: 12px;
     max-width: 100%;
     margin-left: auto;
@@ -180,7 +180,7 @@ select {
     background-color: #00ffff;
     color: #0d1117;
     border: none;
-    padding: 12px 25px; 
+    padding: 15px 25px;
     border-radius: 8px;
     font-size: 1.1em;
     font-weight: bold;
