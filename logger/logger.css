@@ -126,6 +126,8 @@ h1 .highlight {
     margin-bottom: 20px;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 
 label {
@@ -133,6 +135,7 @@ label {
     color: #a3b3c3;
     font-size: 0.95em;
     font-weight: bold;
+    width: 100%;
 }
 
 input[type="text"],
@@ -141,6 +144,10 @@ input[type="datetime-local"],
 select {
     width: calc(100% - 24px);
     padding: 12px;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
     border: 1px solid #00ffff;
     border-radius: 6px;
     background-color: #0d1117;
