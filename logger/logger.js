@@ -178,11 +178,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 listItem.classList.add('editing');
-                e.target.textContent = 'Save';
+                const editButton = e.target;
+                editButton.textContent = 'Save';
+                const deleteButton = listItem.querySelector('.delete-button');
+                const actionsDiv = deleteButton.parentElement;
+                const cancelButton = document.createElement('button');
+                cancelButton.textContent = 'Cancel';
+                cancelButton.classList.add('cancel-button');
+                actionsDiv.insertBefore(cancelButton, deleteButton);
+
+                cancelButton.addEventListener('click', () => {
+                    renderLog();
+                }, { once: true });
 
                 const logEntryInfo = listItem.querySelector('.log-entry-info');
                 const currentSequenceNumber = listItem.querySelector('.log-sequence-number').textContent;
-
                 logEntryInfo.innerHTML = `
                     <span class="log-sequence-number">${currentSequenceNumber}</span>
                     <label>Contact Callsign: <input type="text" class="edit-callsign" value="${entry.callSign}" required></label>
