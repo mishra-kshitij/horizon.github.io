@@ -62,7 +62,6 @@ h1 .highlight {
     color: #00ff80;
 }
 
-
 .personal-callsign-section {
     background-color: #1f252d;
     border-radius: 10px;
@@ -111,7 +110,6 @@ h1 .highlight {
     border-color: #00ffff;
     box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
 }
-
 
 .input-section, .log-section {
     background-color: #1f252d;
@@ -174,6 +172,31 @@ select {
     background-repeat: no-repeat;
     background-position: right 10px center;
     padding-right: 35px;
+}
+
+.rst-group {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    width: 100%;
+    justify-content: center;
+}
+
+.rst-input {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.rst-input label {
+    text-align: center;
+    width: 100%;
+}
+
+.rst-input input {
+    width: calc(100% - 24px);
+    max-width: 150px;
 }
 
 .primary-button {
@@ -430,6 +453,15 @@ input[type="file"] {
 
     #logList li.editing .log-entry-info label {
         flex: 1 1 100%;
+    }
+
+    .rst-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .rst-input input {
+        max-width: 100%;
     }
 
     footer {

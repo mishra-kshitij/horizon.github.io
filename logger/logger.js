@@ -5,7 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const frequencyInput = document.getElementById('frequency');
     const bandInput = document.getElementById('band');
     const modeSelect = document.getElementById('mode');
+    const rstSentInput = document.getElementById('rstSent');
+    const rstReceivedInput = document.getElementById('rstReceived');
     const timeInput = document.getElementById('logTime');
+    const commentInput = document.getElementById('comment');
     const addLogButton = document.getElementById('addLog');
     const saveLogButton = document.getElementById('saveLog');
     const loadFileInput = document.getElementById('loadFileInput');
@@ -117,7 +120,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span><strong>Frequency:</strong> ${entry.frequency} MHz</span>
                     <span><strong>Band:</strong> ${entry.band}</span>
                     <span><strong>Mode:</strong> ${entry.mode}</span>
+                    ${entry.rstSent ? `<span><strong>RST Sent:</strong> ${entry.rstSent}</span>` : ''}
+                    ${entry.rstReceived ? `<span><strong>RST Rec:</strong> ${entry.rstReceived}</span>` : ''}
                     <span><strong>Time:</strong> ${formatUTCForDisplay(entry.time)}</span>
+                    ${entry.comment ? `<span><strong>Comment:</strong> ${entry.comment}</span>` : ''}
                 </div>
                 <div class="log-entry-actions">
                     <button class="edit-button">Edit</button>
@@ -135,13 +141,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const frequency = parseFloat(frequencyInput.value);
         const band = bandInput.value.trim();
         const mode = modeSelect.value;
+        const rstSent = rstSentInput.value.trim();
+        const rstReceived = rstReceivedInput.value.trim();
         const localTime = timeInput.value;
+        const comment = commentInput.value.trim();
 
         if (callSign && !isNaN(frequency) && frequency > 0 && band && mode && localTime) {
             const utcTime = convertLocalToUTC(localTime);
-            logEntries.push({ callSign, frequency, band, mode, time: utcTime });
+            logEntries.push({ callSign, frequency, band, mode, rstSent, rstReceived, time: utcTime, comment });
             renderLog();
             callSignInput.value = '';
+            rstSentInput.value = '';
+            rstReceivedInput.value = '';
+            commentInput.value = '';
             setInitialTime();
         } else {
             alert('Please fill in all valid fields (Callsign, Frequency, Mode, Time).');
@@ -164,14 +176,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 const editedCallSign = listItem.querySelector('.edit-callsign').value.trim().toUpperCase();
                 const editedFrequency = parseFloat(listItem.querySelector('.edit-frequency').value);
                 const editedMode = listItem.querySelector('.edit-mode').value;
+                const editedRstSent = listItem.querySelector('.edit-rst-sent').value.trim();
+                const editedRstReceived = listItem.querySelector('.edit-rst-received').value.trim();
                 const editedLocalTime = listItem.querySelector('.edit-time').value;
+                const editedComment = listItem.querySelector('.edit-comment').value.trim();
 
                 if (editedCallSign && !isNaN(editedFrequency) && editedFrequency > 0 && editedMode && editedLocalTime) {
                     entry.callSign = editedCallSign;
                     entry.frequency = editedFrequency;
                     entry.band = getHamBand(editedFrequency);
                     entry.mode = editedMode;
+                    entry.rstSent = editedRstSent;
+                    entry.rstReceived = editedRstReceived;
                     entry.time = convertLocalToUTC(editedLocalTime);
+                    entry.comment = editedComment;
                     renderLog();
                 } else {
                     alert('Please ensure all fields are valid for saving.');
@@ -212,7 +230,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         <option value="FST4" ${entry.mode === 'FST4' ? 'selected' : ''}>FST4</option>
                         <option value="MSK144" ${entry.mode === 'MSK144' ? 'selected' : ''}>MSK144</option>
                     </select></label>
+                    <label>RST Sent: <input type="text" class="edit-rst-sent" value="${entry.rstSent || ''}"></label>
+                    <label>RST Received: <input type="text" class="edit-rst-received" value="${entry.rstReceived || ''}"></label>
                     <label>Time (Local for Input, UTC for Log): <input type="datetime-local" class="edit-time" value="${convertUTCToLocalDateTime(entry.time)}" required></label>
+                    <label>Comment: <input type="text" class="edit-comment" value="${entry.comment || ''}" maxlength="75"></label>
                 `;
 
                 const editFrequencyInput = listItem.querySelector('.edit-frequency');
@@ -270,8 +291,17 @@ document.addEventListener('DOMContentLoaded', () => {
             adifContent += `<FREQ:${entry.frequency.toFixed(3).length}>${entry.frequency.toFixed(3)}\r\n`;
             adifContent += `<BAND:${entry.band.length}>${entry.band}\r\n`;
             adifContent += `<MODE:${entry.mode.length}>${entry.mode}\r\n`;
+            if (entry.rstSent) {
+                adifContent += `<RST_SENT:${entry.rstSent.length}>${entry.rstSent}\r\n`;
+            }
+            if (entry.rstReceived) {
+                adifContent += `<RST_RCVD:${entry.rstReceived.length}>${entry.rstReceived}\r\n`;
+            }
             adifContent += `<QSO_DATE:${formatADIFDate(entry.time).length}>${formatADIFDate(entry.time)}\r\n`;
             adifContent += `<TIME_ON:${formatADIFTime(entry.time).length}>${formatADIFTime(entry.time)}\r\n`;
+            if (entry.comment) {
+                adifContent += `<COMMENT:${entry.comment.length}>${entry.comment}\r\n`;
+            }
             adifContent += '<EOR>\r\n';
         });
 
@@ -314,16 +344,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     const freqMatch = /<FREQ:(\d+\.?\d*)>([^<]+)/.exec(recordString);
                     const bandMatch = /<BAND:(\d+)>([^<]+)/.exec(recordString);
                     const modeMatch = /<MODE:(\d+)>([^<]+)/.exec(recordString);
+                    const rstSentMatch = /<RST_SENT:(\d+)>([^<]+)/.exec(recordString);
+                    const rstReceivedMatch = /<RST_RCVD:(\d+)>([^<]+)/.exec(recordString);
                     const qsoDateMatch = /<QSO_DATE:(\d+)>([^<]+)/.exec(recordString);
                     const timeOnMatch = /<TIME_ON:(\d+)>([^<]+)/.exec(recordString);
+                    const commentMatch = /<COMMENT:(\d+)>([^<]+)/.exec(recordString);
 
                     if (callMatch && freqMatch && bandMatch && modeMatch && qsoDateMatch && timeOnMatch) {
                         const callSign = callMatch[2];
                         const frequency = parseFloat(freqMatch[2]);
                         const band = bandMatch[2];
                         const mode = modeMatch[2];
+                        const rstSent = rstSentMatch ? rstSentMatch[2] : '';
+                        const rstReceived = rstReceivedMatch ? rstReceivedMatch[2] : '';
                         const qsoDate = qsoDateMatch[2];
                         const timeOn = timeOnMatch[2];
+                        const comment = commentMatch ? commentMatch[2] : '';
 
                         const timeOnPadded = timeOn.padEnd(6, '0');
                         const utcDateTimeString = `${qsoDate.substring(0, 4)}-${qsoDate.substring(4, 6)}-${qsoDate.substring(6, 8)}T${timeOnPadded.substring(0, 2)}:${timeOnPadded.substring(2, 4)}:${timeOnPadded.substring(4, 6)}Z`;
@@ -333,7 +369,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             frequency: frequency,
                             band: band,
                             mode: mode,
-                            time: utcDateTimeString
+                            rstSent: rstSent,
+                            rstReceived: rstReceived,
+                            time: utcDateTimeString,
+                            comment: comment
                         });
                     }
                 }
