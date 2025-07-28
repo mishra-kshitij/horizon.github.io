@@ -7,7 +7,7 @@ const morseCode = {
   '4': '....-', '5': '.....', '6': '-....', '7': '--...', '8': '---..',
   '9': '----.', '0': '-----', '.': '.-.-.-', '&': '.-...', '@': '.--.-.',
   ' ': '/', ')': '-.--.-', '(': '-.--.', ':': '---...', ',': '--..--', '=': '-...-',
-  '!': '-.-.--', '.': '.-.-.-', '-': '-....-', '+': '.-.-.', '?': '..--..', '/': '-..-.', 
+  '!': '-.-.--', '-': '-....-', '+': '.-.-.', '?': '..--..', '/': '-..-.', 
   '"': '.-..-.',
 };
 
@@ -26,29 +26,71 @@ const volumeValue = document.getElementById('volumeValue');
 
 let audioContext;
 let gainNode;
-let oscillators = [];
 let isPlaying = false;
+let playQueue = [];
 
-speedControl.addEventListener('input', () => {
-  speedValue.textContent = speedControl.value;
-});
+function initializeAudioContext() {
+  if (!audioContext || audioContext.state === 'closed') {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    gainNode = audioContext.createGain();
+    gainNode.gain.value = volumeControl.value / 100;
+    gainNode.connect(audioContext.destination);
+  }
+}
 
-toneControl.addEventListener('input', () => {
-  toneValue.textContent = toneControl.value;
-});
+function scheduleTone(duration) {
+  const oscillator = audioContext.createOscillator();
+  oscillator.type = 'sine';
+  oscillator.frequency.setValueAtTime(parseInt(toneControl.value), audioContext.currentTime);
+  oscillator.connect(gainNode);
+  gainNode.gain.setTargetAtTime(volumeControl.value / 100, audioContext.currentTime, 0.01);
+  oscillator.start();
+  oscillator.stop(audioContext.currentTime + duration / 1000);
+}
 
-volumeControl.addEventListener('input', () => {
-  volumeValue.textContent = volumeControl.value;
-  if (gainNode) gainNode.gain.value = volumeControl.value / 100;
-});
+function playMorse(morse) {
+  initializeAudioContext();
+  let idx = 0;
+  let currentTime = Date.now();
+
+  const playNext = () => {
+    if (!isPlaying || idx >= morse.length) return;
+
+    const wpm = parseInt(speedControl.value);
+    const unit = 1200 / wpm;
+
+    const char = morse[idx];
+    idx++;
+
+    if (char === '.') {
+      scheduleTone(unit);
+      setTimeout(playNext, unit + unit);
+    } else if (char === '-') {
+      scheduleTone(unit * 3);
+      setTimeout(playNext, unit * 3 + unit);
+    } else if (char === ' ') {
+      setTimeout(playNext, unit * 2);
+    } else if (char === '/') {
+      setTimeout(playNext, unit * 4);
+    } else {
+      playNext();
+    }
+  };
+
+  playNext();
+}
+
+function clearQueue() {
+  playQueue.forEach(clearTimeout);
+  playQueue = [];
+}
 
 translateButton.addEventListener('click', () => {
   const text = inputField.value.toLowerCase();
   let morse = '';
   isPlaying = true;
 
-  initializeAudioContext();
-  clearOscillators();
+  clearQueue();
 
   text.split('').forEach(char => {
     if (morseCode[char]) morse += morseCode[char] + ' ';
@@ -60,14 +102,14 @@ translateButton.addEventListener('click', () => {
 
 stopButton.addEventListener('click', () => {
   isPlaying = false;
-  clearOscillators();
+  clearQueue();
 });
 
 clearButton.addEventListener('click', () => {
   inputField.value = '';
   displayArea.textContent = '';
-  clearOscillators();
   isPlaying = false;
+  clearQueue();
 });
 
 toggleDisplayButton.addEventListener('click', () => {
@@ -80,59 +122,13 @@ toggleDisplayButton.addEventListener('click', () => {
   }
 });
 
-function initializeAudioContext() {
-  if (!audioContext || audioContext.state === 'closed') {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    gainNode = audioContext.createGain();
-    gainNode.gain.value = volumeControl.value / 100;
-    gainNode.connect(audioContext.destination);
-  }
-}
-
-function playMorse(morse) {
-  const wpm = parseInt(speedControl.value, 10);
-  const unitDuration = 1200 / wpm;
-  const toneFrequency = parseInt(toneControl.value, 10);
-
-  let currentTime = audioContext.currentTime;
-
-  morse.split('').forEach(symbol => {
-    if (!isPlaying) return;
-
-    switch (symbol) {
-      case '.':
-        scheduleBeep(currentTime, unitDuration, toneFrequency);
-        currentTime += unitDuration / 1000 + unitDuration / 1000;
-        break;
-      case '-':
-        scheduleBeep(currentTime, unitDuration * 3, toneFrequency);
-        currentTime += (unitDuration * 3) / 1000 + unitDuration / 1000;
-        break;
-      case ' ':
-        currentTime += (unitDuration * 3) / 1000;
-        break;
-      case '/':
-        currentTime += (unitDuration * 7) / 1000;
-        break;
-    }
-  });
-}
-
-function scheduleBeep(startTime, duration, frequency) {
-  const oscillator = audioContext.createOscillator();
-
-  oscillator.type = 'sine';
-  oscillator.frequency.value = frequency;
-
-  oscillator.connect(gainNode);
-
-  oscillator.start(startTime);
-  oscillator.stop(startTime + duration / 1000);
-
-  oscillators.push(oscillator);
-}
-
-function clearOscillators() {
-  oscillators.forEach(oscillator => oscillator.stop());
-  oscillators = [];
-}
+speedControl.addEventListener('input', () => {
+  speedValue.textContent = speedControl.value;
+});
+toneControl.addEventListener('input', () => {
+  toneValue.textContent = toneControl.value;
+});
+volumeControl.addEventListener('input', () => {
+  volumeValue.textContent = volumeControl.value;
+  if (gainNode) gainNode.gain.value = volumeControl.value / 100;
+});
