@@ -1,14 +1,12 @@
 const morseCode = {
-  'a': '.-', 'b': '-...', 'c': '-.-.', 'd': '-..', 'e': '.', 'f': '..-.',
-  'g': '--.', 'h': '....', 'i': '..', 'j': '.---', 'k': '-.-', 'l': '.-..',
-  'm': '--', 'n': '-.', 'o': '---', 'p': '.--.', 'q': '--.-', 'r': '.-.',
-  's': '...', 't': '-', 'u': '..-', 'v': '...-', 'w': '.--', 'x': '-..-',
-  'y': '-.--', 'z': '--..', '1': '.----', '2': '..---', '3': '...--',
-  '4': '....-', '5': '.....', '6': '-....', '7': '--...', '8': '---..',
-  '9': '----.', '0': '-----', '.': '.-.-.-', '&': '.-...', '@': '.--.-.',
-  ' ': '/', ')': '-.--.-', '(': '-.--.', ':': '---...', ',': '--..--', '=': '-...-',
-  '!': '-.-.--', '.': '.-.-.-', '-': '-....-', '+': '.-.-.', '?': '..--..', '/': '-..-.',
-  '"': '.-..-.',
+  'a':'.-','b':'-...','c':'-.-.','d':'-..','e':'.','f':'..-.',
+  'g':'--.','h':'....','i':'..','j':'.---','k':'-.-','l':'.-..',
+  'm':'--','n':'-.','o':'---','p':'.--.','q':'--.-','r':'.-.',
+  's':'...','t':'-','u':'..-','v':'...-','w':'.--','x':'-..-',
+  'y':'-.--','z':'--..','1':'.----','2':'..---','3':'...--',
+  '4':'....-','5':'.....','6':'-....','7':'--...','8':'---..',
+  '9':'----.','0':'-----',' ': '/', '.':'.-.-.-', ',':'--..--',
+  '?':'..--..','/':'-..-.','-':'-....-','(':'-.--.',')':'-.--.-'
 };
 
 const inputField = document.getElementById('input');
@@ -19,112 +17,146 @@ const clearButton = document.getElementById('clearButton');
 const speedControl = document.getElementById('speed');
 const toneControl = document.getElementById('tone');
 const volumeControl = document.getElementById('volume');
-const toggleDisplayButton = document.getElementById('toggleDisplayButton');
 const speedValue = document.getElementById('speedValue');
 const toneValue = document.getElementById('toneValue');
 const volumeValue = document.getElementById('volumeValue');
+const toggleDisplayButton = document.getElementById('toggleDisplayButton');
+const showMeterCheckbox = document.getElementById('showMeter');
+const meterCanvas = document.getElementById('meter');
+const themeToggle = document.getElementById('themeToggle');
 
-let audioContext;
-let gainNode;
+let audioContext, masterGain, analyser, meterCtx;
 let isPlaying = false;
-let playQueue = [];
+let meterAnimation;
 
-function initializeAudioContext() {
+function initAudio() {
   if (!audioContext || audioContext.state === 'closed') {
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    gainNode = audioContext.createGain();
-    gainNode.gain.value = volumeControl.value / 100;
-    gainNode.connect(audioContext.destination);
+    masterGain = audioContext.createGain();
+    masterGain.connect(audioContext.destination);
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 2048;
+    analyser.smoothingTimeConstant = 0.3;
+    masterGain.connect(analyser);
+    meterCtx = meterCanvas.getContext('2d');
+    if (audioContext.state === 'suspended') audioContext.resume();
   }
+  masterGain.gain.value = volumeControl.value / 100;
 }
 
-function scheduleTone(duration) {
-  const oscillator = audioContext.createOscillator();
-  oscillator.type = 'sine';
-  oscillator.frequency.setValueAtTime(parseInt(toneControl.value), audioContext.currentTime);
+function drawMeter() {
+  if (!showMeterCheckbox.checked || !analyser) return;
+  const bufferLength = analyser.fftSize;
+  const dataArray = new Uint8Array(bufferLength);
+  analyser.getByteTimeDomainData(dataArray);
+  let sum = 0;
+  for (let i = 0; i < bufferLength; i++) {
+    const val = (dataArray[i] - 128) / 128;
+    sum += val * val;
+  }
+  const rms = Math.sqrt(sum / bufferLength);
+  const volume = masterGain.gain.value;
+  const scalingFactor = 2.5; 
+  const level = Math.min(1, rms * scalingFactor * volume);
 
-  const toneGain = audioContext.createGain();
-  toneGain.gain.setValueAtTime(0, audioContext.currentTime);
-  oscillator.connect(toneGain);
-  toneGain.connect(gainNode);
+  const isDark = document.body.classList.contains('dark');
 
-  const now = audioContext.currentTime;
-  const volume = volumeControl.value / 100;
+  meterCtx.fillStyle = isDark ? "#222" : "#eee";
+  meterCtx.fillRect(0, 0, meterCanvas.width, meterCanvas.height);
+  meterCtx.fillStyle = "rgba(47, 200, 139, 0.6)";
+  const barHeight = 12, y = (meterCanvas.height - barHeight) / 2;
+  meterCtx.fillRect(0, y, meterCanvas.width * level, barHeight);
 
-  const attack = 0.002;
-  const release = 0.002;
-  const totalTime = duration / 1000;
-
-  toneGain.gain.linearRampToValueAtTime(volume, now + attack);
-  toneGain.gain.setValueAtTime(volume, now + totalTime - release);
-  toneGain.gain.linearRampToValueAtTime(0, now + totalTime);
-
-  oscillator.start(now);
-  oscillator.stop(now + totalTime);
+  if (isPlaying) meterAnimation = requestAnimationFrame(drawMeter);
 }
 
-function playMorse(morse) {
-  initializeAudioContext();
-  let idx = 0;
-  let currentTime = Date.now();
+function startMeter() {
+  cancelAnimationFrame(meterAnimation);
+  meterAnimation = requestAnimationFrame(drawMeter);
+}
 
-  const playNext = () => {
-    if (!isPlaying || idx >= morse.length) return;
+function stopMeter() {
+  cancelAnimationFrame(meterAnimation);
+  meterCtx.clearRect(0, 0, meterCanvas.width, meterCanvas.height);
+}
 
-    const wpm = parseInt(speedControl.value);
-    const unit = 1200 / wpm;
+showMeterCheckbox.addEventListener('change', () => {
+  if (!showMeterCheckbox.checked) {
+    stopMeter();
+  } else if (isPlaying) {
+    startMeter();
+  }
+});
 
-    const char = morse[idx];
-    idx++;
+function playTone(duration) {
+  const freq = parseFloat(toneControl.value);
+  const osc = audioContext.createOscillator();
+  const g = audioContext.createGain();
+  g.gain.setValueAtTime(masterGain.gain.value, audioContext.currentTime);
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(freq, audioContext.currentTime);
+  osc.connect(g);
+  g.connect(masterGain);
+  g.connect(analyser);
 
-    if (char === '.') {
-      scheduleTone(unit);
-      setTimeout(playNext, unit + unit);
-    } else if (char === '-') {
-      scheduleTone(unit * 3);
-      setTimeout(playNext, unit * 3 + unit);
-    } else if (char === ' ') {
-      setTimeout(playNext, unit * 2);
-    } else if (char === '/') {
-      setTimeout(playNext, unit * 4);
-    } else {
-      playNext();
+  const atk = 0.002, rel = 0.002;
+  const start = audioContext.currentTime;
+  const vol = masterGain.gain.value;
+  g.gain.setValueAtTime(0, start);
+  g.gain.linearRampToValueAtTime(vol, start + atk);
+  g.gain.setValueAtTime(vol, start + duration - rel);
+  g.gain.linearRampToValueAtTime(0, start + duration);
+  osc.start(start);
+  osc.stop(start + duration);
+}
+
+async function playMorse(morse) {
+  initAudio();
+  isPlaying = true;
+  if (showMeterCheckbox.checked) startMeter();
+  const getUnit = () => 1.2 / parseInt(speedControl.value);
+  for (const ch of morse) {
+    if (!isPlaying) break;
+    const unit = getUnit();
+    if (ch === '.') {
+      playTone(unit);
+      await wait(unit * 2);
+    } else if (ch === '-') {
+      playTone(unit * 3);
+      await wait(unit * 4);
+    } else if (ch === ' ') {
+      await wait(unit * 2);
+    } else if (ch === '/') {
+      await wait(unit * 6);
     }
-  };
-
-  playNext();
+  }
+  stopPlayback();
 }
 
-function clearQueue() {
-  playQueue.forEach(clearTimeout);
-  playQueue = [];
+function wait(sec) {
+  return new Promise(r => setTimeout(r, sec * 1000));
+}
+
+function stopPlayback() {
+  isPlaying = false;
+  stopMeter();
 }
 
 translateButton.addEventListener('click', () => {
+  initAudio();
   const text = inputField.value.toLowerCase();
   let morse = '';
-  isPlaying = true;
-
-  clearQueue();
-
-  text.split('').forEach(char => {
-    if (morseCode[char]) morse += morseCode[char] + ' ';
-  });
-
+  for (const c of text) morse += morseCode[c] ? morseCode[c] + ' ' : '';
   displayArea.textContent = morse.trim();
-  playMorse(morse.trim());
+  if (morse.trim()) playMorse(morse.trim());
 });
 
-stopButton.addEventListener('click', () => {
-  isPlaying = false;
-  clearQueue();
-});
+stopButton.addEventListener('click', stopPlayback);
 
 clearButton.addEventListener('click', () => {
   inputField.value = '';
   displayArea.textContent = '';
-  isPlaying = false;
-  clearQueue();
+  stopPlayback();
 });
 
 toggleDisplayButton.addEventListener('click', () => {
@@ -137,13 +169,22 @@ toggleDisplayButton.addEventListener('click', () => {
   }
 });
 
-speedControl.addEventListener('input', () => {
-  speedValue.textContent = speedControl.value;
-});
-toneControl.addEventListener('input', () => {
-  toneValue.textContent = toneControl.value;
-});
-volumeControl.addEventListener('input', () => {
+speedControl.oninput = () => speedValue.textContent = speedControl.value;
+toneControl.oninput = () => toneValue.textContent = toneControl.value;
+volumeControl.oninput = () => {
   volumeValue.textContent = volumeControl.value;
-  if (gainNode) gainNode.gain.value = volumeControl.value / 100;
+  if (masterGain) masterGain.gain.value = volumeControl.value / 100;
+};
+
+themeToggle.addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+  themeToggle.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
 });
+
+function resizeMeter() {
+  meterCanvas.width = meterCanvas.clientWidth;
+}
+window.addEventListener('resize', resizeMeter);
+resizeMeter();
+
+initAudio();
