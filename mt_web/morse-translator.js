@@ -42,10 +42,25 @@ function scheduleTone(duration) {
   const oscillator = audioContext.createOscillator();
   oscillator.type = 'sine';
   oscillator.frequency.setValueAtTime(parseInt(toneControl.value), audioContext.currentTime);
-  oscillator.connect(gainNode);
-  gainNode.gain.setTargetAtTime(volumeControl.value / 100, audioContext.currentTime, 0.01);
-  oscillator.start();
-  oscillator.stop(audioContext.currentTime + duration / 1000);
+
+  const toneGain = audioContext.createGain();
+  toneGain.gain.setValueAtTime(0, audioContext.currentTime);
+  oscillator.connect(toneGain);
+  toneGain.connect(gainNode);
+
+  const now = audioContext.currentTime;
+  const volume = volumeControl.value / 100;
+
+  const attack = 0.002;
+  const release = 0.002;
+  const totalTime = duration / 1000;
+
+  toneGain.gain.linearRampToValueAtTime(volume, now + attack);
+  toneGain.gain.setValueAtTime(volume, now + totalTime - release);
+  toneGain.gain.linearRampToValueAtTime(0, now + totalTime);
+
+  oscillator.start(now);
+  oscillator.stop(now + totalTime);
 }
 
 function playMorse(morse) {
