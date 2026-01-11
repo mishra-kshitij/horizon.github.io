@@ -28,6 +28,10 @@ document.addEventListener('DOMContentLoaded', () => {
     window.open('mt_web/morse-translator.html', '_blank');
   });
 
+  document.getElementById('cwArenaBtn').addEventListener('click', () => {
+    window.open('cw_arena/cw_arena.html', '_blank');
+  });
+  
   document.getElementById('hamRadioLoggerBtn').addEventListener('click', () => {
     window.open('logger/logger.html', '_blank');
   });
