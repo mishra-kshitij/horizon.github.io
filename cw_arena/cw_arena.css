@@ -78,7 +78,13 @@ button {
   background:var(--panel);
   color:var(--text);
   font-size:16px;
-  transition:.2s;
+  transition:0.2s;
+}
+
+#playBtn.playing {
+  box-shadow:0 0 14px rgba(255,215,0,0.8);
+  background:linear-gradient(135deg,#ffd43b,#fab005);
+  color:black;
 }
 
 #submitBtn {

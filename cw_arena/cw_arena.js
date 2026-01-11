@@ -1,11 +1,13 @@
 const AudioCtx = window.AudioContext || window.webkitAudioContext
 const audioCtx = new AudioCtx()
 
-let oscillator, gainNode
 let attempts = 0
 let correct = 0
 let level = 1
 let currentCalls = []
+
+let playId = 0
+let activeOscillators = []
 
 const MAX_ATTEMPTS = 10
 const LEVEL_WPM = {1:20,2:25,3:30,4:35}
@@ -63,11 +65,16 @@ themeToggle.onclick = () => {
   themeToggle.textContent = t === "light" ? "🌙" : "☀️"
 }
 
-const randomCallsign = () =>
-  PREFIXES[Math.floor(Math.random()*PREFIXES.length)] +
-  Math.floor(Math.random()*10) +
-  String.fromCharCode(65+Math.random()*26|0) +
-  String.fromCharCode(65+Math.random()*26|0)
+const randomCallsign = () => {
+  const prefix = PREFIXES[Math.floor(Math.random() * PREFIXES.length)]
+  const number = Math.floor(Math.random() * 10)
+  const suffixLength = Math.random() < 0.2 ? 1 : Math.random() < 0.75 ? 2 : 3
+  let suffix = ""
+  for (let i = 0; i < suffixLength; i++) {
+    suffix += String.fromCharCode(65 + (Math.random() * 26 | 0))
+  }
+  return prefix + number + suffix
+}
 
 const nextRound = () => {
   currentCalls = []
@@ -76,53 +83,69 @@ const nextRound = () => {
   }
 }
 
-const playTone = d => {
-  oscillator = audioCtx.createOscillator()
-  gainNode = audioCtx.createGain()
-  oscillator.frequency.value = tone.value
-  gainNode.gain.value = volume.value / 100
-  oscillator.connect(gainNode)
-  gainNode.connect(audioCtx.destination)
-  oscillator.start()
-  setTimeout(() => oscillator.stop(), d)
+const stopAllAudio = () => {
+  activeOscillators.forEach(o => {
+    try { o.stop() } catch {}
+  })
+  activeOscillators = []
+  playBtn.classList.remove("playing")
 }
 
-const playMorse = text => {
-  let unit = 1200 / wpm.value
-  let t = 0
+const playTone = (duration, token) => {
+  if (token !== playId) return
+  const osc = audioCtx.createOscillator()
+  const gain = audioCtx.createGain()
+  osc.frequency.value = tone.value
+  gain.gain.value = volume.value / 100
+  osc.connect(gain)
+  gain.connect(audioCtx.destination)
+  osc.start()
+  activeOscillators.push(osc)
+  setTimeout(() => {
+    try { osc.stop() } catch {}
+  }, duration)
+}
+
+const playMorse = async (text, token) => {
+  const unit = 1200 / wpm.value
   for (let c of text) {
     for (let s of MORSE[c]) {
-      setTimeout(() => playTone(s === "." ? unit : unit * 3), t)
-      t += s === "." ? unit * 2 : unit * 4
+      if (token !== playId) return
+      playTone(s === "." ? unit : unit * 3, token)
+      await new Promise(r => setTimeout(r, s === "." ? unit * 2 : unit * 4))
     }
-    t += unit * (3 + Number(farnsworth.value))
+    await new Promise(r => setTimeout(r, unit * (3 + Number(farnsworth.value))))
   }
 }
 
-playBtn.onclick = () => {
+playBtn.onclick = async () => {
+  await audioCtx.resume()
+  playId++
+  stopAllAudio()
+  const token = playId
+  playBtn.classList.add("playing")
   reveal.textContent = "Played Callsign: —"
-  currentCalls.forEach((c, i) => setTimeout(() => playMorse(c), i * 1600))
+
+  for (let c of currentCalls) {
+    await playMorse(c, token)
+    if (token !== playId) return
+    await new Promise(r => setTimeout(r, 400))
+  }
+
+  if (token === playId) playBtn.classList.remove("playing")
 }
 
 submitBtn.onclick = () => {
   attempts++
-
   const input = userInput.value.trim().toUpperCase().split(/\s+/)
-  const ok =
-    input.length === currentCalls.length &&
-    input.every((v, i) => v === currentCalls[i])
-
+  const ok = input.length === currentCalls.length && input.every((v,i)=>v===currentCalls[i])
   submitBtn.className = ok ? "correct" : "wrong"
-  setTimeout(() => submitBtn.className = "", 500)
-
+  setTimeout(()=>submitBtn.className="",500)
   if (ok) correct++
-
   reveal.textContent = `Played Callsign: ${currentCalls.join("  ")}`
-
-  const acc = Math.round((correct / attempts) * 100)
+  const acc = Math.round(correct/attempts*100)
   stats.textContent = `Attempt: ${attempts} / 10 | Accuracy: ${acc}%`
-  accuracyBar.style.width = acc + "%"
-
+  accuracyBar.style.width = acc+"%"
   userInput.value = ""
 
   if (attempts === MAX_ATTEMPTS) {
@@ -131,13 +154,11 @@ submitBtn.onclick = () => {
       levelSelect.value = level
       wpm.value = LEVEL_WPM[level]
     }
-
     attempts = 0
     correct = 0
     accuracyBar.style.width = "0%"
     stats.textContent = "Attempt: 0 / 10 | Accuracy: 0%"
   }
-
   nextRound()
 }
 
