@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CW Arena by VU2JDC</title>
+<link rel="stylesheet" href="cw_arena.css">
+</head>
+
+<body>
+<div class="app">
+
+<header class="header">
+  <div>
+    <h1>CW Arena</h1>
+    <div class="byline">by VU2JDC</div>
+  </div>
+  <button id="themeToggle" title="Toggle theme">🌙</button>
+</header>
+
+<section class="controls">
+
+  <div class="control">
+    <label>Level</label>
+    <select id="level">
+      <option value="beginner">Beginner</option>
+      <option value="medium">Medium</option>
+      <option value="advanced">Advanced</option>
+    </select>
+  </div>
+
+  <div class="control">
+    <label id="wpmLabel">WPM 20</label>
+    <input type="range" id="wpm" min="5" max="40" value="20">
+  </div>
+
+  <div class="control">
+    <label id="farnsworthLabel">Farnsworth 0</label>
+    <input type="range" id="farnsworth" min="0" max="10" value="0">
+  </div>
+
+  <div class="control">
+    <label id="toneLabel">Tone (Hz) 600</label>
+    <input type="range" id="tone" min="300" max="1000" value="600">
+  </div>
+
+  <div class="control">
+    <label id="volumeLabel">Volume 50%</label>
+    <input type="range" id="volume" min="0" max="100" value="50">
+  </div>
+
+</section>
+
+<section class="buttons">
+  <button id="startBtn" class="start">Start Game</button>
+  <button id="playBtn" class="play">▶ Play CW</button>
+</section>
+
+<section class="answer">
+  <input id="userInput" placeholder="Type heard callsign">
+  <button id="submitBtn">Submit</button>
+</section>
+
+<section class="reveal">
+  <span id="reveal">Played Callsign: —</span>
+</section>
+
+<section class="status">
+  <div id="stats">Attempt: 0 / 10 | Accuracy: 0%</div>
+  <div class="progress">
+    <div id="accuracyBar"></div>
+  </div>
+</section>
+
+</div>
+
+<script src="cw_arena.js"></script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+:root {
+  --bg: #0b0f14;
+  --panel: #141b24;
+  --text: #eaeaea;
+  --accent: #1c7ed6;
+  --accent-soft: #228be6;
+}
+
+[data-theme="light"] {
+  --bg: #f4f6f8;
+  --panel: #ffffff;
+  --text: #1a1a1a;
+  --accent: #1971c2;
+  --accent-soft: #339af0;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+}
+
+.app {
+  width: 100%;
+  max-width: 900px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+h1 {
+  font-size: 36px;
+  margin-bottom: 4px;
+}
+
+.byline {
+  opacity: 0.6;
+}
+
+#themeToggle {
+  font-size: 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.controls {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.control label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+input[type="range"], select {
+  width: 100%;
+}
+
+.buttons {
+  margin-top: 25px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+button {
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+button.start:hover {
+  background: #2f9e44;
+}
+
+button.stop:hover {
+  background: #c92a2a;
+}
+
+button.play.active {
+  background: #f59f00;
+  color: black;
+}
+
+.answer {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 1fr 160px;
+  gap: 15px;
+}
+
+.answer input {
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+}
+
+#submitBtn {
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+#submitBtn:hover {
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+}
+
+#submitBtn.correct {
+  background: gold !important;
+  color: black;
+  box-shadow: 0 0 18px gold;
+}
+
+#submitBtn.wrong {
+  background: #c92a2a !important;
+  color: white;
+  box-shadow: 0 0 14px #c92a2a;
+}
+
+.status {
+  margin-top: 18px;
+}
+
+.progress {
+  height: 8px;
+  background: #333;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+#accuracyBar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, gold, orange);
+}
