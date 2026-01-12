@@ -88,6 +88,12 @@ input, select {
   gap:12px;
 }
 
+.meaning {
+  margin-top: 6px;
+  opacity: 0.75;
+  font-size: 14px;
+}
+
 button {
   padding:14px;
   border-radius:10px;
