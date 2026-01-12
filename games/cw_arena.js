@@ -13,38 +13,7 @@ const ITEMS_PER_LEVEL = { 1:1, 2:2, 3:2, 4:2 }
 const ABBR_PROB = { 1:0.7, 2:0.4, 3:0.2, 4:0.1 }
 
 const PREFIXES = [
-  "AA","AB","AC","AD","AE","AF","AG","AH","AI","AJ","AK","AL",
-  "K","N","W",
-  "VE","VA","VO","VY",
-  "DL","F","G","M","GM","MM","GI","MI","GW","MW",
-  "EI",
-  "ON","PA","PB","PC","PD","PE","PF","PG","PH","PI",
-  "LX","HB","OE",
-  "SM","OH","OZ","LA","TF",
-  "I","EA","CT","SV",
-  "9A","S5","YU","T7","Z3","SP","OK","OL","OM",
-  "HA","LZ","YO","ER","ES","YL","LY",
-  "UA","UB","UC","UD","UE","UF","UG","UH","UI","UR",
-  "EU","EV","EK","4L","UN",
-  "JA","JE","JF","JG","JH","JI",
-  "BY","HL","BV","VR","XX9",
-  "VU","AP","4S","9N","S2",
-  "9M2","9M6","9M8",
-  "HS",
-  "YB","YC","YE","YF",
-  "DU","XV","XU",
-  "9V",
-  "4X","4Z",
-  "A7","A6","HZ","EP","YI","OD","TA",
-  "ZS","ZR",
-  "5H","5X","5Z",
-  "SU","CN","3V","7X",
-  "9J","9K","A5",
-  "KP4","CO","J6","J3","PJ2","PJ4",
-  "XE","TG","TI","HP","YN",
-  "PY","LU","CX","CE","HK","YV","OA","HC","CP","ZP",
-  "VK","ZL",
-  "P29","FO","KH6"
+  "AA","AB","AC","AD","AE","AF","AG","AH","AI","AJ","AK","AL","K","N","W","KL","KP2","KP4","KH6","VE","VA","VO","VY","DL","F","G","M","GM","MM","GI","MI","GW","MW","EI","GU","ON","PA","PB","PC","PD","PE","PF","PG","PH","PI","LX","HB","OE","SM","OH","OZ","LA","TF","IS","TK","I","EA","EA6","EA8","CT","SV","SV5","SV9","9A","S5","SP","OK","OM","HA","LZ","YO","ER","ES","YL","LY","UA","UR","JA","JE","JF","JG","JH","JI","HL","BY","BV","VR","XW","VU","AP","4S","9N","S2","9M2","9M4","9M6","9M8","HS","YB","YC","YE","YF","DU","XV","XU","9V","A6","A7","HZ","EP","YI","OD","TA","JY","ZS","ZR","ZS8","5H","5X","5Z","ET","EL","5N","9G","7P","SU","CN","3V","7X","9J","9K","A5","KP4","CO","J6","J3","PJ2","PJ4","XE","TG","TI","HP","YN","PY","LU","CX","CE","HK","YV","OA","HC","CP","ZP","VK","VK9","VK0","ZL","P29","FO","VP6"
 ]
 
 const CW_ABBR = [
@@ -52,7 +21,6 @@ const CW_ABBR = [
   { a:"73",  d:"Best regards" },
   { a:"88",  d:"Love and kisses" },
   { a:"99",  d:"Go away" },
-
   { a:"AA",  d:"All after" },
   { a:"AB",  d:"All before" },
   { a:"ABT", d:"About" },
@@ -62,7 +30,6 @@ const CW_ABBR = [
   { a:"ANT", d:"Antenna" },
   { a:"ARND",d:"Around" },
   { a:"AS",  d:"Wait" },
-
   { a:"BCI", d:"Broadcast interference" },
   { a:"BCNU",d:"Be seeing you" },
   { a:"BEAM",d:"Directional antenna (typically a Yagi)" },
@@ -73,18 +40,19 @@ const CW_ABBR = [
   { a:"BUG", d:"Semi-automatic key" },
   { a:"BURO",d:"QSL bureau" },
   { a:"B4",  d:"Before" },
-
+  { a:"C",   d:"Yes / Correct" },
   { a:"CFM", d:"Confirm" },
   { a:"CL",  d:"Clear" },
   { a:"CQ",  d:"Calling any station" },
+  { a:"CQDX",d:"Calling distant stations" },
   { a:"CW",  d:"Continuous waves" },
-
   { a:"DE",  d:"From / This is" },
-  { a:"DX",  d:"Distance / DX" },
-
+  { a:"DX",  d:"Distance / DX station" },
   { a:"EL",  d:"Element (e.g. in a Yagi antenna)" },
+  { a:"ES",  d:"And" },
+  { a:"FER", d:"For" },
   { a:"FB",  d:"Fine business" },
-
+  { a:"UFB", d:"Ultra fine business" },
   { a:"GA",  d:"Go ahead / Good afternoon" },
   { a:"GD",  d:"Good day" },
   { a:"GE",  d:"Good evening" },
@@ -93,36 +61,56 @@ const CW_ABBR = [
   { a:"GN",  d:"Good night" },
   { a:"GND", d:"Ground system or ground-mounted antenna" },
   { a:"GP",  d:"Ground-plane antenna" },
-
   { a:"HI",  d:"Laughter" },
   { a:"HR",  d:"Here" },
   { a:"HW",  d:"How copy" },
-
-  { a:"K",   d:"Over" },
+  { a:"K",   d:"Over / Go ahead" },
   { a:"KN",  d:"Over to named station only" },
-
+  { a:"LID", d:"Poor operator" },
   { a:"LW",  d:"Long-wire antenna" },
-
+  { a:"MSG", d:"Message" },
+  { a:"NR",  d:"Number / Near" },
+  { a:"NAME",d:"Operator name" },
+  { a:"OP",  d:"Operator" },
   { a:"OM",  d:"Old man" },
-
+  { a:"PSE", d:"Please" },
+  { a:"PWR", d:"Power" },
+  { a:"QRK", d:"Readability" },
+  { a:"QRL", d:"Busy" },
+  { a:"QRM", d:"Man-made interference" },
+  { a:"QRN", d:"Natural interference / static" },
+  { a:"QRO", d:"Increase power" },
+  { a:"QRP", d:"Decrease power" },
+  { a:"QRQ", d:"Send faster" },
+  { a:"QRS", d:"Send slower" },
+  { a:"QRT", d:"Stop sending" },
+  { a:"QRU", d:"Nothing more to send" },
+  { a:"QSO", d:"Contact / communication" },
+  { a:"QSY", d:"Change frequency" },
+  { a:"QTH", d:"Location" },
+  { a:"R",   d:"Received / Roger" },
   { a:"RR",  d:"Received / Roger Roger" },
   { a:"RST", d:"Signal report" },
-
+  { a:"RPT", d:"Report" },
+  { a:"RIG", d:"Transmitter / transceiver" },
+  { a:"SIG", d:"Signal" },
   { a:"SK",  d:"End of contact / Silent key" },
+  { a:"SKED",d:"Scheduled time to meet" },
   { a:"SO",  d:"Usually before HW (How copy)" },
-
+  { a:"SR",  d:"Sorry" },
+  { a:"TEMP",d:"Temperature" },
+  { a:"TEST",d:"Contest call" },
   { a:"TNX", d:"Thanks" },
   { a:"TU",  d:"Thank you" },
-
   { a:"UR",  d:"Your / You are" },
-
   { a:"VERT",d:"Vertical antenna" },
   { a:"VY",  d:"Very" },
-
   { a:"WX",  d:"Weather" },
-
+  { a:"YL",  d:"Young Lady (female operator)" },
+  { a:"XYL", d:"Wife of a radio operator" },
   { a:"YAGI",d:"Specific type of directional beam antenna" }
 ]
+let sessionAbbrPool = [...CW_ABBR]
 
 const MORSE = {
 A:".-",B:"-...",C:"-.-.",D:"-..",E:".",F:"..-.",G:"--.",
@@ -141,9 +129,18 @@ const randomCallsign = () => {
          String.fromCharCode(65 + Math.random() * 26 | 0)
 }
 
+const getUniqueSessionAbbr = () => {
+  if (!sessionAbbrPool.length) return null
+  return sessionAbbrPool.splice(
+    Math.random() * sessionAbbrPool.length | 0,
+    1
+  )[0]
+}
+
 const generateItem = () => {
   if (Math.random() < ABBR_PROB[level]) {
-    const a = CW_ABBR[Math.random() * CW_ABBR.length | 0]
+const a = getUniqueSessionAbbr() || 
+          CW_ABBR[Math.random() * CW_ABBR.length | 0]
     return { play: a.a, expected: a.a, display: `${a.a} — ${a.d}` }
   }
   const c = randomCallsign()
