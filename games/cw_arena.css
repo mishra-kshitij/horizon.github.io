@@ -12,7 +12,10 @@
   --accent:#1971c2;
 }
 
-* { box-sizing:border-box; font-family:system-ui,sans-serif; }
+* {
+  box-sizing:border-box;
+  font-family:system-ui,sans-serif;
+}
 
 body {
   background:var(--bg);
@@ -22,7 +25,10 @@ body {
   padding:16px;
 }
 
-.app { width:100%; max-width:900px; }
+.app {
+  width:100%;
+  max-width:900px;
+}
 
 .header {
   display:flex;
@@ -30,9 +36,14 @@ body {
   align-items:center;
 }
 
-h1 { margin:0; font-size:32px; }
+h1 {
+  margin:0;
+  font-size:32px;
+}
 
-.byline { opacity:.6; }
+.byline {
+  opacity:.6;
+}
 
 #themeToggle {
   background:none;
@@ -49,11 +60,18 @@ h1 { margin:0; font-size:32px; }
   gap:14px;
 }
 
-.control label { display:block; margin-bottom:6px; }
+.control label {
+  display:block;
+  margin-bottom:6px;
+}
 
-input, select { width:100%; }
+input, select {
+  width:100%;
+}
 
-.answer { margin-top:20px; }
+.answer {
+  margin-top:20px;
+}
 
 .answer input {
   width:100%;
@@ -82,32 +100,29 @@ button {
 }
 
 button.small, a.small {
-  padding: 6px 10px;
-  font-size: 14px;
+  padding:6px 10px;
+  font-size:14px;
   background:linear-gradient(135deg,#ffd43b,#fab005);
   color:#1a1a1a;
-  border: 1px solid var(--border);
-  
+  border-radius:8px;
+  font-weight:600;
+  text-decoration:none;
 }
 
 .home-wrap {
-  display: flex;
-  justify-content: center;
-  margin-top: 12px;
+  display:flex;
+  justify-content:center;
+  margin-top:12px;
 }
 
-button:hover, a.small:hover { opacity: 0.9; }
+button:hover, a.small:hover {
+  opacity:0.9;
+}
 
 #playBtn.playing {
   box-shadow:0 0 14px rgba(255,215,0,0.8);
   background:linear-gradient(135deg,#ffd43b,#fab005);
-  color:white;
-}
-
-#submitBtn {
-  background:var(--accent);
-  color:white;
-  font-weight:600;
+  color:black;
 }
 
 #submitBtn.correct {
@@ -121,9 +136,9 @@ button:hover, a.small:hover { opacity: 0.9; }
   box-shadow:0 0 14px #c92a2a;
 }
 
-.reveal { margin-top:14px; }
-
-.status { margin-top:14px; }
+.reveal, .status {
+  margin-top:14px;
+}
 
 .progress {
   height:8px;
@@ -139,12 +154,14 @@ button:hover, a.small:hover { opacity: 0.9; }
 }
 
 footer {
-  text-align: center;
-  margin-top: 12px;
-  color: var(--muted);
-  font-size: 13px;
+  text-align:center;
+  margin-top:12px;
+  font-size:13px;
+  opacity:0.7;
 }
 
 @media(max-width:600px){
-  .buttons{grid-template-columns:1fr;}
+  .buttons {
+    grid-template-columns:1fr;
+  }
 }
