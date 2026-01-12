@@ -12,8 +12,8 @@ let level = 1
 let currentItems = []
 
 const MAX_ATTEMPTS = 10
-const LEVEL_WPM = { 1: 20, 2: 25, 3: 30, 4: 35 }
-const ITEMS_PER_LEVEL = { 1: 1, 2: 2, 3: 2, 4: 2 }
+const LEVEL_WPM = {1:20,2:25,3:30,4:35}
+const ITEMS_PER_LEVEL = {1:1,2:2,3:2,4:2}
 
 const MORSE = {
   A:".-",B:"-...",C:"-.-.",D:"-..",E:".",F:"..-.",G:"--.",
@@ -63,99 +63,88 @@ const playBtn = $("playBtn")
 const submitBtn = $("submitBtn")
 const userInput = $("userInput")
 const reveal = $("reveal")
-const hint = $("hint")
+const meaning = $("meaning")
 const stats = $("stats")
 const accuracyBar = $("accuracyBar")
+
 const wpm = $("wpm")
 const farnsworth = $("farnsworth")
 const tone = $("tone")
 const volume = $("volume")
 
-function playTone(durationMs) {
-  ensureAudio()
+const wait = ms => new Promise(r => setTimeout(r, ms))
 
+function playTone(ms) {
+  ensureAudio()
   const osc = audioCtx.createOscillator()
   const gain = audioCtx.createGain()
 
   osc.frequency.value = tone.value
-
-  const now = audioCtx.currentTime
-  const dur = durationMs / 1000
-
-  gain.gain.setValueAtTime(0, now)
-  gain.gain.setTargetAtTime(volume.value / 100, now, 0.005)
-  gain.gain.setTargetAtTime(0, now + dur, 0.02)
+  gain.gain.value = volume.value / 100
 
   osc.connect(gain)
   gain.connect(audioCtx.destination)
 
-  osc.start(now)
-  osc.stop(now + dur + 0.05)
+  osc.start()
+  osc.stop(audioCtx.currentTime + ms / 1000)
 }
 
 async function playMorse(text) {
   const unit = 1200 / wpm.value
-
   for (const ch of text) {
     if (!MORSE[ch]) continue
-    for (const el of MORSE[ch]) {
-      playTone(el === "." ? unit : unit * 3)
-      await wait(el === "." ? unit * 2 : unit * 4)
+    for (const s of MORSE[ch]) {
+      playTone(s === "." ? unit : unit * 3)
+      await wait(s === "." ? unit * 2 : unit * 4)
     }
     await wait(unit * (3 + Number(farnsworth.value)))
   }
 }
 
-const wait = ms => new Promise(r => setTimeout(r, ms))
-
 const randCall = () =>
-  PREFIXES[Math.random() * PREFIXES.length | 0] +
-  (Math.random() * 10 | 0) +
-  String.fromCharCode(65 + Math.random() * 26 | 0)
+  PREFIXES[Math.random()*PREFIXES.length|0] +
+  (Math.random()*9|0) +
+  String.fromCharCode(65+Math.random()*26|0)
 
-const randAbbr = () => ABBR[Math.random() * ABBR.length | 0]
+const randAbbr = () => ABBR[Math.random()*ABBR.length|0]
 
 function nextRound() {
   currentItems = []
   reveal.textContent = "Last Played: —"
-  hint.textContent = ""
+  meaning.textContent = ""
 
-  const count = ITEMS_PER_LEVEL[level]
-
-  while (currentItems.length < count) {
-    if (level === 1 && Math.random() > 0.7) {
-      currentItems.push({ t: randCall(), type: "call" })
+  while (currentItems.length < ITEMS_PER_LEVEL[level]) {
+    if (Math.random() > 0.6) {
+      currentItems.push({t: randCall(), type:"call"})
     } else {
       const a = randAbbr()
-      currentItems.push({ t: a.k, d: a.d, type: "abbr" })
+      currentItems.push({t:a.k, d:a.d, type:"abbr"})
     }
   }
 }
 
 playBtn.onclick = async () => {
   ensureAudio()
-  for (const item of currentItems) {
-    await playMorse(item.t)
-    await wait(300)
+  for (const i of currentItems) {
+    await playMorse(i.t)
+    await wait(400)
   }
 }
 
 submitBtn.onclick = () => {
   attempts++
+  const input = userInput.value.trim().toUpperCase()
+  const expected = currentItems.map(i=>i.t).join(" ")
 
-  const input = userInput.value.trim().toUpperCase().split(/\s+/)
-  const expected = currentItems.map(i => i.t)
+  if (input === expected) correct++
 
-  if (input.join(" ") === expected.join(" ")) correct++
+  reveal.textContent = "Last Played: " + expected
+  meaning.textContent = currentItems
+    .filter(i=>i.type==="abbr")
+    .map(i=>i.d)
+    .join(" | ")
 
-  reveal.textContent = "Last Played: " + expected.join(" ")
-
-  const abbrs = currentItems.filter(i => i.type === "abbr")
-  hint.textContent = abbrs.length
-    ? "Meaning: " + abbrs.map(a => a.d).join(" | ")
-    : ""
-
-  const acc = Math.round((correct / attempts) * 100)
+  const acc = Math.round((correct/attempts)*100)
   stats.textContent = `Attempt: ${attempts}/${MAX_ATTEMPTS} | Accuracy: ${acc}%`
   accuracyBar.style.width = acc + "%"
 
@@ -163,8 +152,7 @@ submitBtn.onclick = () => {
 
   if (attempts === MAX_ATTEMPTS) {
     if (acc === 100 && level < 4) level++
-    attempts = 0
-    correct = 0
+    attempts = correct = 0
     accuracyBar.style.width = "0%"
   }
 
