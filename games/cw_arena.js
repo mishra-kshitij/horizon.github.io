@@ -21,9 +21,29 @@ V:"...-",W:".--",X:"-..-",Y:"-.--",Z:"--..",
 }
 
 const ABBR = [
-  ["AA","All after"],["AB","All before"],["ABT","About"],["ADR","Address"],["AGN","Again"],["ANR","Another"],["ANT","Antenna"],["ARND","Around"],["AS","Wait"],["BCI","Broadcast interference"],["BCNU","Be seeing you"],["BK","Break"],["BN","All between"],["BTR","Better"],["BTU","Back to you"],["BUG","Semi-automatic key"],["BURO","QSL bureau"],["B4","Before"],["C","Yes / Correct"],["CFM","Confirm"],["CL","Clear"],["SO","SO usually before HW-How copy"],["CQ","Calling any station"],["CW","Continuous waves"],["DE","From / This is"],["DX","Distance / DX"],["FB","Fine business"],["GA","Go ahead/Good afternoon"],["GE","Good evening"],["GM","Good morning"],["GL","Good luck"],["GN","Good night"],["GD","Good day"],["HI","Laughter"],["HR","Here"],["HW","How copy"],["K","Over"],["KN","Over to named station only"],["OM","Old man"],["R","Received / Roger Roger when R R"],["RST","Signal report"],["SK","End of contact / Silent key"],["TNX","Thanks"],["TU","Thank you"],["UR","Your / You are"],["VY","Very"],["WX","Weather"],["72","Best wishes QRP"],["73","Best regards"],["88","Love and kisses"],["99","Go away"]
+  ["AA","All after"],["AB","All before"],["ABT","About"],["ADR","Address"],
+  ["AGN","Again"],["ANR","Another"],["ANT","Antenna"],["ARND","Around"],
+  ["AS","Wait"],["BCI","Broadcast interference"],["BCNU","Be seeing you"],
+  ["BK","Break"],["BN","All between"],["BTR","Better"],["BTU","Back to you"],
+  ["BUG","Semi-automatic key"],["BURO","QSL bureau"],["B4","Before"],
+  ["C","Yes / Correct"],["CFM","Confirm"],["CL","Clear"],
+  ["SO","SO usually before HW-How copy"],["CQ","Calling any station"],
+  ["CW","Continuous waves"],["DE","From / This is"],["DX","Distance / DX"],
+  ["FB","Fine business"],["GA","Go ahead/Good afternoon"],
+  ["GE","Good evening"],["GM","Good morning"],["GL","Good luck"],
+  ["GN","Good night"],["GD","Good day"],["HI","Laughter"],
+  ["HR","Here"],["HW","How copy"],["K","Over"],
+  ["KN","Over to named station only"],["OM","Old man"],
+  ["R","Received / Roger Roger when R R"],["RST","Signal report"],
+  ["SK","End of contact / Silent key"],["TNX","Thanks"],
+  ["TU","Thank you"],["UR","Your / You are"],
+  ["VY","Very"],["WX","Weather"],
+  ["72","Best wishes QRP"],["73","Best regards"],
+  ["88","Love and kisses"],["99","Go away"]
 ].map(([k,d])=>({k,d}))
+
 const PREFIXES = ["AA","AB","AC","AD","AE","AF","AG","AH","AI","AJ","AK","AL","K","N","W","VE","VA","VO","VY","DL","F","G","M","GM","MM","GI","MI","GW","MW","EI","ON","PA","PB","PC","PD","PE","PF","PG","PH","PI","LX","HB","OE","SM","OH","OZ","LA","TF","I","EA","CT","SV","9A","S5","YU","T7","Z3","SP","OK","OL","OM","HA","LZ","YO","ER","ES","YL","LY","UA","UB","UC","UD","UE","UF","UG","UH","UI","UR","EU","EV","EK","4L","UN","JA","JE","JF","JG","JH","JI","BY","HL","BV","VR","XX9","VU","AP","4S","9N","S2","9M2","9M6","9M8","HS","YB","YC","YE","YF","DU","XV","XU","9V","4X","4Z","A7","A6","HZ","EP","YI","OD","TA","ZS","ZR","5H","5X","5Z","SU","CN","3V","7X","9J","9K","A5","KP4","CO","J6","J3","PJ2","PJ4","XE","TG","TI","HP","YN","PY","LU","CX","CE","HK","YV","OA","HC","CP","ZP","VK","ZL","P29","FO","KH6"]
+
 const $ = id => document.getElementById(id)
 const reveal = $("reveal")
 const hint = $("hint")
@@ -39,16 +59,24 @@ const volume = $("volume")
 
 const playTone = (dur, token) => {
   if (token !== playId) return
+
   const osc = audioCtx.createOscillator()
   const gain = audioCtx.createGain()
+
   osc.frequency.value = tone.value
   gain.gain.setValueAtTime(0, audioCtx.currentTime)
-  gain.gain.linearRampToValueAtTime(volume.value/100, audioCtx.currentTime+0.01)
-  gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime+dur/1000)
+  gain.gain.setTargetAtTime(volume.value / 100, audioCtx.currentTime, 0.005)
+  gain.gain.setTargetAtTime(
+    0,
+    audioCtx.currentTime + dur / 1000,
+    0.015
+  )
+
   osc.connect(gain)
   gain.connect(audioCtx.destination)
+
   osc.start()
-  osc.stop(audioCtx.currentTime+dur/1000)
+  osc.stop(audioCtx.currentTime + dur / 1000 + 0.05)
 }
 
 const playMorse = async (txt, token) => {
@@ -56,8 +84,8 @@ const playMorse = async (txt, token) => {
   for (const c of txt) {
     if (!MORSE[c]) continue
     for (const s of MORSE[c]) {
-      playTone(s==="."?unit:unit*3, token)
-      await new Promise(r=>setTimeout(r, s==="."?unit*2:unit*4))
+      playTone(s==="." ? unit : unit*3, token)
+      await new Promise(r=>setTimeout(r, s==="." ? unit*2 : unit*4))
     }
     await new Promise(r=>setTimeout(r, unit*(3+Number(farnsworth.value))))
   }
@@ -85,11 +113,6 @@ const nextRound = () => {
       currentItems.push({t:a.k,type:"abbr",d:a.d})
     }
   }
-
-  const desc = currentItems.filter(i=>i.type==="abbr")
-  if(desc.length){
-    hint.textContent="Meaning: " + desc.map(i=>`${i.t} = ${i.d}`).join(" | ")
-  }
 }
 
 playBtn.onclick = async ()=>{
@@ -107,6 +130,11 @@ submitBtn.onclick = ()=>{
   if(ok) correct++
 
   reveal.textContent="Last Played: "+expected.join(" ")
+
+  const abbrs=currentItems.filter(i=>i.type==="abbr")
+  hint.textContent = abbrs.length
+    ? "Meaning: " + abbrs.map(a=>a.d).join(" | ")
+    : ""
 
   const acc=Math.round(correct/attempts*100)
   stats.textContent=`Attempt: ${attempts}/${MAX_ATTEMPTS} | Accuracy: ${acc}%`
