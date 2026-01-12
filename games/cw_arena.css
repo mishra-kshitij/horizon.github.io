@@ -53,6 +53,13 @@ h1 {
   color:var(--text);
 }
 
+.level-banner {
+  text-align:center;
+  margin:14px 0;
+  font-size:20px;
+  font-weight:700;
+}
+
 .controls {
   margin-top:20px;
   display:grid;
@@ -65,7 +72,7 @@ h1 {
   margin-bottom:6px;
 }
 
-input, select {
+input {
   width:100%;
 }
 
@@ -96,7 +103,30 @@ button {
   background:var(--accent);
   color:white;
   font-size:16px;
-  transition:0.2s;
+  transition:all 0.25s ease;
+}
+
+#playBtn.playing {
+  background: linear-gradient(135deg, #ffd43b, #fab005);
+  color: #1a1a1a;
+  box-shadow: 0 0 18px rgba(255, 212, 59, 0.9);
+}
+
+#submitBtn.correct {
+  background:linear-gradient(135deg,#ffd43b,#fab005);
+  color:#1a1a1a;
+  box-shadow:0 0 18px rgba(255,212,59,0.9);
+  transform:scale(1.02);
+}
+
+#submitBtn.wrong {
+  background:#c92a2a;
+  box-shadow:0 0 16px rgba(201,42,42,0.9);
+  transform:scale(0.98);
+}
+
+#submitBtn {
+  transition:all 0.25s ease;
 }
 
 button.small, a.small {
@@ -117,23 +147,6 @@ button.small, a.small {
 
 button:hover, a.small:hover {
   opacity:0.9;
-}
-
-#playBtn.playing {
-  box-shadow:0 0 14px rgba(255,215,0,0.8);
-  background:linear-gradient(135deg,#ffd43b,#fab005);
-  color:black;
-}
-
-#submitBtn.correct {
-  background:gold;
-  color:black;
-  box-shadow:0 0 20px gold;
-}
-
-#submitBtn.wrong {
-  background:#c92a2a;
-  box-shadow:0 0 14px #c92a2a;
 }
 
 .reveal, .status {
