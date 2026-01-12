@@ -5,22 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CW Arena by VU2JDC</title>
 <meta name="description" content="CW Arena – A fast-paced, competitive browser game that challenges your reflexes and strategic skills. Play online, face global opponents, and climb the leaderboards in this thrilling arena experience!" />
-<meta name="keywords" content="CW Arena, browser game, online gaming, arcade challenge, reflex game, multiplayer arena, casual game, web game, competitive gaming, learning game" />
+<meta name="keywords" content="CW Arena, browser game, online gaming, arcade challenge, reflex game, multiplayer arena, casual game, web game, competitive gaming, HTML5 game" />
 <meta name="author" content="Kshitij Mishra">
 <link rel="icon" href="img/VU2JDC_Icon.jpg" />
 <link rel="stylesheet" href="cw_arena.css">
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://kshitijmishra.in/games/cw_arena.html" />
 <meta property="og:site_name" content="CW Arena by VU2JDC" />
-<meta property="og:title" content="CW Arena by VU2JDC" />
+<meta property="og:title" content="CW Arena by VU2JDC - Kshitij Mishra" />
 <meta property="og:description" content="CW Arena – A fast-paced, competitive browser game that challenges your reflexes and strategic skills. Play online, or on-the-go, and learn morse with this thrilling arena experience!" />
 <meta property="og:image" content="https://kshitijmishra.in/games/img/KM_WebBanner.jpg" />
 <meta property="twitter:card" content="summary_large_image" />
 <meta property="twitter:url" content="https://kshitijmishra.in/games/cw_arena.html" />
-<meta property="twitter:title" content="CW Arena by VU2JDC" />
+<meta property="twitter:title" content="CW Arena by VU2JDC - Kshitij Mishra" />
 <meta property="twitter:description" content="CW Arena – A fast-paced, competitive browser game that challenges your reflexes and strategic skills. Play online, or on-the-go, and learn morse with this thrilling arena experience!" />
 <meta property="twitter:image" content="https://kshitijmishra.in/games/img/KM_WebBanner.jpg" />
 </head>
+
 <body>
 <div class="app">
 
@@ -36,16 +37,16 @@
   <div class="control">
     <label>Level</label>
     <select id="level" disabled>
-      <option>Level 1</option>
-      <option>Level 2</option>
-      <option>Level 3</option>
-      <option>Level 4</option>
+      <option value="1">Level 1</option>
+      <option value="2">Level 2</option>
+      <option value="3">Level 3</option>
+      <option value="4">Level 4</option>
     </select>
   </div>
 
   <div class="control">
     <label id="wpmLabel">WPM 20</label>
-    <input type="range" id="wpm" min="10" max="60" value="20">
+    <input type="range" id="wpm" min="10" max="60">
   </div>
 
   <div class="control">
@@ -65,7 +66,7 @@
 </section>
 
 <section class="answer">
-  <input id="userInput" placeholder="Enter what you copied (space separated)">
+  <input id="userInput" placeholder="Enter callsign(s) separated by space">
 </section>
 
 <section class="buttons">
@@ -73,18 +74,24 @@
   <button id="submitBtn">Submit</button>
 </section>
 
+<div class="home-wrap">
+  <a href="../index.html" class="small">🏠 Home</a>
+</div>
+
 <section class="reveal">
-  <div id="reveal">Last Played: —</div>
-  <div id="meaning" class="meaning"></div>
+  <span id="reveal">Last Played Callsign: —</span>
 </section>
 
 <section class="status">
   <div id="stats">Attempt: 0 / 10 | Accuracy: 0%</div>
-  <div class="progress"><div id="accuracyBar"></div></div>
+  <div class="progress">
+    <div id="accuracyBar"></div>
+  </div>
 </section>
 
 <footer>
-  <p>© 2026 Kshitij Mishra</p>
+  <p>Powered by Zeda Corp.</p>
+  <p>© 2026 Kshitij Mishra - All Rights Reserved.</p>
 </footer>
 
 </div>
