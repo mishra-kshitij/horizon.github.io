@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('cwArenaBtn').addEventListener('click', () => {
-    window.open('cw_arena/cw_arena.html', '_blank');
+    window.open('games/cw_arena.html', '_blank');
   });
   
   document.getElementById('hamRadioLoggerBtn').addEventListener('click', () => {

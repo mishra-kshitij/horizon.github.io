@@ -75,16 +75,33 @@ button {
   border-radius:10px;
   border:none;
   cursor:pointer;
-  background:var(--panel);
-  color:var(--text);
+  background:var(--accent);
+  color:white;
   font-size:16px;
   transition:0.2s;
 }
 
+button.small, a.small {
+  padding: 6px 10px;
+  font-size: 14px;
+  background:linear-gradient(135deg,#ffd43b,#fab005);
+  color:#1a1a1a;
+  border: 1px solid var(--border);
+  
+}
+
+.home-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+button:hover, a.small:hover { opacity: 0.9; }
+
 #playBtn.playing {
   box-shadow:0 0 14px rgba(255,215,0,0.8);
   background:linear-gradient(135deg,#ffd43b,#fab005);
-  color:black;
+  color:white;
 }
 
 #submitBtn {
@@ -119,6 +136,13 @@ button {
   height:100%;
   width:0%;
   background:linear-gradient(90deg,gold,orange);
+}
+
+footer {
+  text-align: center;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 13px;
 }
 
 @media(max-width:600px){
