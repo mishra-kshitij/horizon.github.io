@@ -197,6 +197,13 @@ const volume = $("volume")
 const levelBadge = $("levelBadge")
 const themeToggle = $("themeToggle")
 
+userInput.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    e.preventDefault()
+    submitBtn.click()
+  }
+})
+
 const updateLabels = () => {
   $("wpmLabel").textContent = `WPM ${wpm.value}`
   $("farnsworthLabel").textContent = `Farnsworth ${farnsworth.value}`
