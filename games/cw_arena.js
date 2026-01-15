@@ -14,9 +14,19 @@ const LEVEL_WPM = { 1:20, 2:25, 3:30, 4:35 }
 const ITEMS_PER_LEVEL = { 1:1, 2:2, 3:2, 4:2 }
 const ABBR_PROB = { 1:0.7, 2:0.4, 3:0.2, 4:0.1 }
 
-
 const PREFIXES = [
-  "AA","AB","AC","AD","AE","AF","AG","AH","AI","AJ","AK","AL","K","N","W","KL","KP2","KP4","KH6","VE","VA","VO","VY","DL","F","G","M","GM","MM","GI","MI","GW","MW","EI","GU","ON","PA","PB","PC","PD","PE","PF","PG","PH","PI","LX","HB","OE","SM","OH","OZ","LA","TF","IS","TK","I","EA","EA6","EA8","CT","SV","SV5","SV9","9A","S5","SP","OK","OM","HA","LZ","YO","ER","ES","YL","LY","UA","UR","JA","JE","JF","JG","JH","JI","HL","BY","BV","VR","XW","VU","VU2","VU3","AP","4S","9N","S2","9M2","9M4","9M6","9M8","HS","YB","YC","YE","YF","DU","XV","XU","9V","A6","A7","HZ","EP","YI","OD","TA","JY","ZS","ZR","ZS8","5H","5X","5Z","ET","EL","5N","9G","7P","SU","CN","3V","7X","9J","9K","A5","KP4","CO","J6","J3","PJ2","PJ4","XE","TG","TI","HP","YN","PY","LU","CX","CE","HK","YV","OA","HC","CP","ZP","VK","VK9","VK0","ZL","P29","FO","VP6"
+  "AA","AB","AC","AD","AE","AF","AG","AH","AI","AJ","AK","AL","AT","K","N","W",
+  "KL","KP2","KP4","KH6","VE","VA","VO","VY","DL","F","G","M","GM","MM",
+  "GI","MI","GW","MW","EI","GU","ON","PA","PB","PC","PD","PE","PF","PG",
+  "PH","PI","LX","HB","OE","SM","OH","OZ","LA","TF","IS","TK","I","EA",
+  "EA6","EA8","CT","SV","SV5","SV9","9A","S5","SP","OK","OM","HA","LZ",
+  "YO","ER","ES","YL","LY","UA","UR","JA","JE","JF","JG","JH","JI","HL",
+  "BY","BV","VR","XW","VU","VU2","VU3","AP","4S","9N","S2","9M2","9M4",
+  "9M6","9M8","HS","YB","YC","YE","YF","DU","XV","XU","9V","A6","A7",
+  "HZ","EP","YI","OD","TA","JY","ZS","ZR","ZS8","5H","5X","5Z","ET",
+  "EL","5N","9G","7P","SU","CN","3V","7X","9J","9K","A5","KP4","CO",
+  "J6","J3","PJ2","PJ4","XE","TG","TI","HP","YN","PY","LU","CX","CE",
+  "HK","YV","OA","HC","CP","ZP","VK","VK9","VK0","ZL","P29","FO","VP6"
 ]
 
 const CW_ABBR = [
@@ -74,8 +84,21 @@ V:"...-",W:".--",X:"-..-",Y:"-.--",Z:"--..",
 const $ = id => document.getElementById(id)
 
 const randomCallsign = () => {
-  const p = PREFIXES[Math.random() * PREFIXES.length | 0]
-  return p + (Math.random() * 10 | 0) + String.fromCharCode(65 + Math.random() * 26 | 0)
+  const prefix = PREFIXES[Math.random() * PREFIXES.length | 0]
+
+  const digitCount = 1 + (Math.random() * 3 | 0)
+  let digits = ""
+  for (let i = 0; i < digitCount; i++) {
+    digits += Math.random() * 10 | 0
+  }
+
+  const suffixLen = 1 + (Math.random() * 3 | 0)
+  let suffix = ""
+  for (let i = 0; i < suffixLen; i++) {
+    suffix += String.fromCharCode(65 + Math.random() * 26 | 0)
+  }
+
+  return prefix + digits + suffix
 }
 
 const getUniqueSessionAbbr = () => {
@@ -120,10 +143,10 @@ const playMorse = async (txt, token) => {
     const code = MORSE[c]
     if (!code) continue
     for (const s of code) {
-      playTone(s === "." ? unit : unit*3, token)
-      await sleep(s === "." ? unit*2 : unit*4)
+      playTone(s === "." ? unit : unit * 3, token)
+      await sleep(s === "." ? unit * 2 : unit * 4)
     }
-    await sleep(unit*3 + fGap)
+    await sleep(unit * 3 + fGap)
   }
 }
 
@@ -171,27 +194,34 @@ userInput.addEventListener("blur", ()=>setTimeout(()=>userInput.focus(),50))
 
 playBtn.onclick = async () => {
   await audioCtx.resume()
+
   playToken++
   const token = playToken
+
   playBtn.classList.add("playing")
   reveal.textContent = "—"
+
   for (const item of currentItems) {
     if (token !== playToken) break
     await playMorse(item.play, token)
     await sleep(400)
   }
+
   playBtn.classList.remove("playing")
 }
 
 submitBtn.onclick = () => {
   if (!userInput.value.trim()) return
   attempts++
+
   const input = userInput.value.trim().toUpperCase().split(/\s+/)
   const expected = currentItems.map(i => i.expected)
   const ok = input.length === expected.length && input.every((v,i)=>v===expected[i])
   if (ok) correct++
-  submitBtn.classList.add(ok?"correct":"wrong")
+
+  submitBtn.classList.add(ok ? "correct" : "wrong")
   setTimeout(()=>submitBtn.classList.remove("correct","wrong"),500)
+
   reveal.textContent = currentItems.map(i=>i.display).join(" | ")
 
   const acc = Math.round(correct / attempts * 100)
@@ -207,12 +237,17 @@ submitBtn.onclick = () => {
     accuracyBar.style.width = "0%"
   }
 
-  const lvlWpm = LEVEL_WPM[level]
+  const levelWpm = LEVEL_WPM[level]
+
   if (userWpmOverride !== null) {
-    wpm.value = userWpmOverride < lvlWpm ? userWpmOverride : lvlWpm
-    if (userWpmOverride >= lvlWpm) userWpmOverride = null
+    if (userWpmOverride >= levelWpm) {
+      wpm.value = userWpmOverride
+    } else {
+      userWpmOverride = null
+      wpm.value = levelWpm
+    }
   } else {
-    wpm.value = lvlWpm
+    wpm.value = levelWpm
   }
 
   updateLabels()
@@ -238,11 +273,15 @@ if (savedTheme) {
   document.body.dataset.theme = savedTheme
   themeToggle.textContent = savedTheme === "light" ? "🌙" : "☀️"
 }
+
 themeToggle.onclick = () => {
-  const t = document.body.dataset.theme === "light" ? "" : "light"
-  document.body.dataset.theme = t
-  localStorage.setItem("cw-theme", t)
-  themeToggle.textContent = t === "light" ? "🌙" : "☀️"
+  const isLight = document.body.dataset.theme === "light"
+  const newTheme = isLight ? "" : "light"
+
+  document.body.dataset.theme = newTheme
+  localStorage.setItem("cw-theme", newTheme)
+
+  themeToggle.textContent = newTheme === "light" ? "🌙" : "☀️"
 }
 
 wpm.value = LEVEL_WPM[level]
