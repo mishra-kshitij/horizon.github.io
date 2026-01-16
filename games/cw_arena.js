@@ -1,5 +1,6 @@
 const AudioCtx = window.AudioContext || window.webkitAudioContext
 const audioCtx = new AudioCtx()
+const IS_ANDROID = /Android/i.test(navigator.userAgent)
 
 let attempts = 0
 let correct = 0
@@ -34,40 +35,111 @@ const CW_ABBR = [
   { a:"88",  d:"Love and kisses" },{ a:"99",  d:"Go away" },
   { a:"AA",  d:"All after" },{ a:"AB",  d:"All before" },
   { a:"ABT", d:"About" },{ a:"ADR", d:"Address" },
-  { a:"AGN", d:"Again" },{ a:"ANR", d:"Another" },
+  { a:"AGN", d:"Again" },{ a:"AGN?", d:"Again?" },
+  { a:"ANR", d:"Another" },
   { a:"ANT", d:"Antenna" },{ a:"ARND",d:"Around" },
-  { a:"AS",  d:"Wait" },{ a:"BCI", d:"Broadcast interference" },
-  { a:"BCNU",d:"Be seeing you" },{ a:"BEAM",d:"Directional antenna" },
-  { a:"BK",  d:"Break" },{ a:"BN",  d:"All between" },
-  { a:"BTR", d:"Better" },{ a:"BTU", d:"Back to you" },
-  { a:"BUG", d:"Semi-automatic key" },{ a:"BURO",d:"QSL bureau" },
-  { a:"B4",  d:"Before" },{ a:"C",   d:"Yes / Correct" },
-  { a:"CFM", d:"Confirm" },{ a:"CL",  d:"Clear" },
-  { a:"CQ",  d:"Calling any station" },{ a:"CQDX",d:"Calling distant stations" },
-  { a:"CW",  d:"Continuous waves" },{ a:"DE",  d:"From / This is" },
-  { a:"DX",  d:"Distance / DX station" },{ a:"EL",  d:"Element (e.g. in a Yagi antenna)" },
-  { a:"ES",  d:"And" },{ a:"FER", d:"For" },{ a:"FB",  d:"Fine business" },
-  { a:"UFB", d:"Ultra fine business" },{ a:"GA",  d:"Go ahead / Good afternoon" },
-  { a:"GD",  d:"Good day" },{ a:"GE",  d:"Good evening" },{ a:"GL",  d:"Good luck" },
-  { a:"GM",  d:"Good morning" },{ a:"GN",  d:"Good night" },
-  { a:"GND", d:"Ground system or ground-mounted antenna" },{ a:"GP",  d:"Ground-plane antenna" },
-  { a:"HI",  d:"Laughter" },{ a:"HR",  d:"Here" },{ a:"HW",  d:"How copy" },
-  { a:"K",   d:"Over / Go ahead" },{ a:"KN",  d:"Over to named station only" },
-  { a:"LID", d:"Poor operator" },{ a:"LW",  d:"Long-wire antenna" },{ a:"MSG", d:"Message" },
-  { a:"NR",  d:"Number / Near" },{ a:"NAME",d:"Operator name" },{ a:"OP",  d:"Operator" },
-  { a:"OM",  d:"Old man" },{ a:"PSE", d:"Please" },{ a:"POTA", d:"Parks On The Air" },
-  { a:"PWR", d:"Power" },{ a:"QRK", d:"Readability" },
-  { a:"QRL", d:"Busy" },{ a:"QRM", d:"Man-made interference" },{ a:"QRN", d:"Natural interference / static" },
-  { a:"QRO", d:"Increase power" },{ a:"QRP", d:"Decrease power" },{ a:"QRQ", d:"Send faster" },
-  { a:"QRS", d:"Send slower" },{ a:"QRT", d:"Stop sending" },{ a:"QRU", d:"Nothing more to send" },
-  { a:"QSO", d:"Contact / communication" },{ a:"QST", d:"General call meaning 'Attention all stations!'" },{ a:"QSY", d:"Change frequency" },{ a:"QTH", d:"Location" },
-  { a:"R",   d:"Received / Roger" },{ a:"RR",  d:"Received / Roger Roger" },{ a:"RST", d:"Signal report" },
-  { a:"RPT", d:"Report" },{ a:"RIG", d:"Transmitter / transceiver" },{ a:"SIG", d:"Signal" },
-  { a:"SK",  d:"End of contact / Silent key" },{ a:"SKED",d:"Scheduled time to meet" },{ a:"SO",  d:"Usually before HW (How copy)" },
-  { a:"SOTA", d:"Summits On The Air" },{ a:"SR",  d:"Sorry" },{ a:"TEMP",d:"Temperature" },{ a:"TEST",d:"Contest call" },{ a:"TNX", d:"Thanks" },
-  { a:"TU",  d:"Thank you" },{ a:"UR",  d:"Your / You are" },{ a:"VERT",d:"Vertical antenna" },{ a:"VVV",  d:"CW Test Signal" },{ a:"VY",  d:"Very" },
-  { a:"WX",  d:"Weather" },{ a:"YL",  d:"Young Lady (female operator)" },{ a:"XYL", d:"Wife of a radio operator" },
-  { a:"YAGI",d:"Specific type of directional beam antenna" }
+  { a:"AR",  d:"End of message" },
+  { a:"AS",  d:"Wait" },
+  { a:"BCI", d:"Broadcast interference" },
+  { a:"BCNU",d:"Be seeing you" },
+  { a:"BEAM",d:"Directional antenna" },
+  { a:"BK",  d:"Break" },
+  { a:"BN",  d:"All between" },
+  { a:"BT",  d:"Separator / Break between thoughts" },
+  { a:"BTR", d:"Better" },
+  { a:"BTU", d:"Back to you" },
+  { a:"BUG", d:"Semi-automatic key" },
+  { a:"BURO",d:"QSL bureau" },
+  { a:"B4",  d:"Before" },
+  { a:"CFM", d:"Confirm" },
+  { a:"CL",  d:"Closing (I am closing my station)" },
+  { a:"CLR",  d:"Clear" },
+  { a:"CQ",  d:"Calling any station" },
+  { a:"CQDX",d:"Calling distant stations" },
+  { a:"CW",  d:"Continuous waves" },
+  { a:"DE",  d:"From / This is" },
+  { a:"DR",  d:"Dear" },
+  { a:"DX",  d:"Distance / DX station" },
+  { a:"DXCC",d:"DX Century Club" },
+  { a:"EL",  d:"Element (e.g. in a Yagi antenna)" },
+  { a:"ES",  d:"And" },
+  { a:"FER", d:"For" },
+  { a:"FB",  d:"Fine business" },
+  { a:"UFB", d:"Ultra fine business" },
+  { a:"GA",  d:"Go ahead / Good afternoon as per Context" },
+  { a:"GD",  d:"Good or Good day as per Context" },
+  { a:"GE",  d:"Good evening" },
+  { a:"GL",  d:"Good luck" },
+  { a:"GM",  d:"Good morning" },
+  { a:"GN",  d:"Good night" },
+  { a:"GND", d:"Ground system or ground-mounted antenna" },
+  { a:"GP",  d:"Ground-plane antenna" },
+  { a:"HI",  d:"Laughter" },
+  { a:"HR",  d:"Here" },
+  { a:"HW",  d:"How copy" },
+  { a:"HW?", d:"How copy? Preceeded by SO" },
+  { a:"K",   d:"Over / Go ahead" },
+  { a:"KN",  d:"Over to named station only" },
+  { a:"LID", d:"Poor operator" },
+  { a:"LOG", d:"Logbook" },
+  { a:"LOTW",d:"Logbook of The World" },
+  { a:"LW",  d:"Long-wire antenna" },
+  { a:"MSG", d:"Message" },
+  { a:"NR",  d:"Number or Near as per Context" },
+  { a:"NR?", d:"Number?" },
+  { a:"NAME",d:"Operator's name" },
+  { a:"OM",  d:"Old man or Male Radio Operator" },
+  { a:"OP",  d:"Operator" },
+  { a:"PFX", d:"Prefix" },
+  { a:"PSE", d:"Please" },
+  { a:"POTA",d:"Parks On The Air" },
+  { a:"PWR", d:"Power" },
+  { a:"QRK", d:"Readability" },
+  { a:"QRL", d:"Busy" },
+  { a:"QRM", d:"Man-made interference" },
+  { a:"QRN", d:"Natural interference / static" },
+  { a:"QRO", d:"Increase power" },
+  { a:"QRP", d:"Decrease power" },
+  { a:"QRQ", d:"Send faster" },
+  { a:"QRS", d:"Send slower" },
+  { a:"QRT", d:"Stop sending" },
+  { a:"QRU", d:"Nothing more to send" },
+  { a:"QRZ", d:"Who is calling me?" },
+  { a:"QSB", d:"Fading" },
+  { a:"QSK", d:"Break-in" },
+  { a:"QSL", d:"Acknowledge receipt / Confirmation" },
+  { a:"QRL?",d:"Is this Frequency in use?" },
+  { a:"QSO", d:"Contact / communication" },
+  { a:"QST", d:"General call to all stations" },
+  { a:"QSY", d:"Change frequency" },
+  { a:"QTC", d:"Message traffic" },
+  { a:"QTH", d:"Location" },
+  { a:"RR",  d:"Received / Roger Roger" },
+  { a:"RST", d:"Signal report" },
+  { a:"RPT", d:"Repeat or Report as per Context" },
+  { a:"RPRT",d:"Report" },
+  { a:"RIG", d:"Transmitter / transceiver" },
+  { a:"SIG", d:"Signal" },
+  { a:"SK",  d:"End of contact / Silent key" },
+  { a:"SKED",d:"Scheduled time to meet" },
+  { a:"SO",  d:"So, Usually used before HW (How copy)" },
+  { a:"SOTA",d:"Summits On The Air" },
+  { a:"SR",  d:"Sorry" },
+  { a:"TEMP",d:"Temperature" },
+  { a:"TEST",d:"Contest call" },
+  { a:"TNX", d:"Thanks" },
+  { a:"TU",  d:"Thank you" },
+  { a:"UR",  d:"Your / You are" },
+  { a:"VERT",d:"Vertical antenna" },
+  { a:"VVV", d:"CW Test Signal" },
+  { a:"VY",  d:"Very" },
+  { a:"WX",  d:"Weather" },
+  { a:"YL",  d:"Young Lady (female operator)" },
+  { a:"XYL", d:"Wife of a radio operator" },
+  { a:"YAGI",d:"Directional beam antenna" },
+  { a:"FT8", d:"Digital weak-signal mode" },
+  { a:"PSK", d:"Phase Shift Keying" },
+  { a:"RBN", d:"Reverse Beacon Network" }
 ]
 
 let sessionAbbrPool = [...CW_ABBR]
@@ -78,27 +150,27 @@ H:"....",I:"..",J:".---",K:"-.-",L:".-..",M:"--",N:"-.",
 O:"---",P:".--.",Q:"--.-",R:".-.",S:"...",T:"-",U:"..-",
 V:"...-",W:".--",X:"-..-",Y:"-.--",Z:"--..",
 0:"-----",1:".----",2:"..---",3:"...--",4:"....-",5:".....",
-6:"-....",7:"--...",8:"---..",9:"----."
+6:"-....",7:"--...",8:"---..",9:"----.","?":"..--.."
 }
 
 const $ = id => document.getElementById(id)
 
 const randomCallsign = () => {
   const prefix = PREFIXES[Math.random() * PREFIXES.length | 0]
+  const r = Math.random()
+  const totalLen = r < 0.4 ? 5 : r < 0.8 ? 6 : 7
+  const digit = String(Math.random() * 10 | 0)
+  const lettersNeeded = Math.max(
+    1,
+    totalLen - (prefix.length + 1)
+  )
 
-  const digitCount = 1 + (Math.random() * 3 | 0)
-  let digits = ""
-  for (let i = 0; i < digitCount; i++) {
-    digits += Math.random() * 10 | 0
-  }
-
-  const suffixLen = 1 + (Math.random() * 3 | 0)
   let suffix = ""
-  for (let i = 0; i < suffixLen; i++) {
+  for (let i = 0; i < lettersNeeded; i++) {
     suffix += String.fromCharCode(65 + Math.random() * 26 | 0)
   }
 
-  return prefix + digits + suffix
+  return prefix + digit + suffix
 }
 
 const getUniqueSessionAbbr = () => {
@@ -191,6 +263,15 @@ userInput.addEventListener("input", () => {
 })
 
 userInput.addEventListener("blur", ()=>setTimeout(()=>userInput.focus(),50))
+
+if (IS_ANDROID) {
+  userInput.addEventListener("beforeinput", e => {
+    if (e.inputType === "insertText" && e.data === " ") {
+      e.preventDefault()
+      playBtn.click()
+    }
+  })
+}
 
 playBtn.onclick = async () => {
   await audioCtx.resume()
