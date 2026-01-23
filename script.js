@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
   faders.forEach(section => appearOnScroll.observe(section));
 
   document.getElementById('emailMeBtn').addEventListener('click', () => {
-    window.location.href = 'mailto:vu2jdc@gmail.com?subject=Let’s Connect!';
+    window.location.href = 'mailto:kshitij.mishra@hotmail.com?subject=Let’s Connect!';
   });
 
   document.getElementById('morseCodeBtn').addEventListener('click', () => {
