@@ -28,9 +28,9 @@ window.open("https://zeda.in","_blank")
 }
 })
 
-document.querySelectorAll("#vidyutraBtn").forEach(btn=>{
+document.querySelectorAll("#zedatekBtn").forEach(btn=>{
 btn.onclick=()=>{
-window.open("https://vidyutra.com","_blank")
+window.open("https://zedatek.com","_blank")
 }
 })
 
