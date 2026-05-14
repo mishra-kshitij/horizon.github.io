@@ -22,12 +22,6 @@ window.location.href="mailto:kshitij.mishra@hotmail.com"
 }
 })
 
-document.querySelectorAll("#zedaInBtn").forEach(btn=>{
-btn.onclick=()=>{
-window.open("https://zeda.in","_blank")
-}
-})
-
 document.querySelectorAll("#zedatekBtn").forEach(btn=>{
 btn.onclick=()=>{
 window.open("https://zedatek.com","_blank")
